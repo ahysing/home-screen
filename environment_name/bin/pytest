@@ -1,0 +1,7 @@
+#!/Users/andreas.hysing/Documents/code/home-screen/environment_name/bin/python
+
+import warnings
+warnings.simplefilter('default', DeprecationWarning)
+
+from logilab.common.pytest import run
+run()

@@ -1,0 +1,10 @@
+#!/Users/andreas.hysing/Documents/code/home-screen/environment_name/bin/python
+# EASY-INSTALL-ENTRY-SCRIPT: 'home-screen==1.0','console_scripts','initialize_home-screen_db'
+__requires__ = 'home-screen==1.0'
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.exit(
+        load_entry_point('home-screen==1.0', 'console_scripts', 'initialize_home-screen_db')()
+    )

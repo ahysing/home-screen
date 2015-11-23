@@ -1,0 +1,8 @@
+SQLAlchemy
+zope.sqlalchemy
+utm
+logging
+requests
+requests_ntlm
+ldap3
+paramiko

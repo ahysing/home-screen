@@ -1,0 +1,5 @@
+virtualenv environment_name --no-site-packages
+source environment_name/bin/activate
+pcreate -s alchemy home-screen
+python setup.py develop
+pserve development.ini

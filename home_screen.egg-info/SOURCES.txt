@@ -1,0 +1,7 @@
+home_screen.egg-info/PKG-INFO
+home_screen.egg-info/SOURCES.txt
+home_screen.egg-info/dependency_links.txt
+home_screen.egg-info/entry_points.txt
+home_screen.egg-info/not-zip-safe
+home_screen.egg-info/requires.txt
+home_screen.egg-info/top_level.txt

@@ -1,0 +1,73 @@
+@import url(//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700);
+body {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 300;
+  color: #ffffff;
+  background: #bc2131;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 300;
+}
+
+.clock {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 500%;
+  font-weight: bold;
+}
+
+.forecast-credits {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 100%;
+  font-weight: bold;
+}
+
+.forecast {
+  font-size: 1000%;
+  font-weight: bold;
+}
+
+.temperature {
+  font-size: 40%;
+  font-weight: bold;
+  left: 50%;
+}
+.weather-time {
+  font-size: 25%;
+  font-weight: bold;
+  left: 50%;
+}
+
+.weather-container {
+  padding: 0.1em;
+}
+
+input.authenticate{
+    margin: 0.1em;
+}
+.authenticate {
+    width: 180px;
+}
+
+.horizontal-line {
+   width: 100%;
+   height: 3px;
+   background-color: #fefefe;
+   margin: 0 auto;
+}
+.vertical-line {
+   width: 1px;
+   height: 300px;
+   background-color: #fefefe;
+   margin: 0 auto;
+}
+.inactive-form {
+   visibility: hidden;
+}
+.active-form {
+}
