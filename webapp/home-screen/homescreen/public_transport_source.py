@@ -60,7 +60,10 @@ def scan_closest_stopid_for_location(latitude, longitude):
     latitude_n = 0
     longitude_n = 0
     try:
-        latitude_n = float(latitude_n)
+        latitude_n = float(latitude)
+    except ValueError as a:
+        logger.error(str(a))
+    try:
         longitude_n = float(longitude)
     except ValueError as a:
         logger.error(str(a))
