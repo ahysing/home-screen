@@ -53,6 +53,20 @@ The response is the next public transport departures', 'params': ['latitude', 'l
         return {'error': message, 'params': ['latitude', 'longitude']}
 
 
+@view_config(route_name='forecast:static', renderer='templates/forecast_static.pt')
+def forecast_static(request):
+    icon = 'wi'
+    temperature = '0'
+    time_from = '00:00'
+    time_to = '00:00'
+    error = None
+    try:
+        forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
+    except YrException as e:
+	error = str(e)
+        logger.error(str(e))
+    return {'icon': icon, 'temperature': temperature, 'from':time_from, 'to':time_to, 'error': error}
+
 @view_config(route_name='forecast', renderer='json')
 def forecast(request):
     try:
