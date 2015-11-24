@@ -1,14 +1,14 @@
 from pyramid.response import Response
 from pyramid.view import view_config
 from sqlalchemy.exc import DBAPIError
-import input_validation
-import zip_place_source
-import weather_source
-import public_transport_source
 from .models import (
     DBSession,
     MyModel,
 )
+import input_validation
+import zip_place_source
+import weather_source
+import public_transport_source
 from .mail_source import MailSource, MsExchangeException
 import datetime
 import traceback
@@ -123,7 +123,7 @@ def index_static(request):
     try:
         mail_source = MailSource(root_url, service_account_username=username, service_account_password=password)
         calendar = mail_source.lookupCalendarTo(end)
-        return { 'mail_url' : root_url, 'calendar': None, 'show_authenticate': 'active-form' }
+        return { 'mail_url' : root_url, 'calendar': calendar, 'show_authenticate': 'active-form' }
     except MsExchangeException as e:
         message = str(e)
         request.response.status = 500

@@ -8,6 +8,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class YrException(Exception):
+    pass
+
 class WeatherHandler(xml.sax.handler.ContentHandler):
     """
     kilde: http://om.yr.no/verdata/xml/spesifikasjon/
@@ -288,7 +291,7 @@ def parse_forecast(raw):
         return wr
     except xml.sax.SAXParseException as e:
         logger.error(str(e))
-
+        raise YrException(e)
     return None
 
 

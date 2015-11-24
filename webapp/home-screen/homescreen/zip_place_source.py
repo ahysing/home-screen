@@ -8,6 +8,10 @@ from homescreen.zip_place import ZipPlace
 logger = logging.getLogger(__name__)
 
 
+class GeonorgeException(Exception):
+    pass
+
+
 def parse_postnummer(raw):
     zip_dict = {}
     reader = csv.reader(raw)
@@ -73,8 +77,6 @@ def parse_postnummer_closest_to(raw, latitude, longitude):
         return current_postnummer
     except Exception, e:
         logger.error(str(e))
-
-
 
 
 def fetch_postnummer_closest_to(latitude, longitude, radius=0.1, num_results=1, page=0):

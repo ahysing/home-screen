@@ -1,24 +1,59 @@
+import xml, xml.sax
 import urllib2
 import json
 import datetime
 import logging
 import utm
-from homescreen import public_transport
+from .public_transport import Departure, DepartureResponse
+from .departure_handler import DepartureHandler
+import cStringIO
 
 logger = logging.getLogger(__name__)
 
 
-def parse_stopid_for_location(raw):
+class RuterException(Exception):
+    pass
+
+
+def parse_json_departures(raw):
     json_decoder = json.JSONDecoder()
-    stopids = []
+    departures = []
     try:
-        stops = json_decoder.decode(raw)
-        for s in stops:
-            stopid = s['ID']
-            stopids.append(stopid)
+        transports = json_decoder.decode(raw)
+        for transport in transports:
+            departure = transport['MonitoredVehicleJourney']
+            d = Departure()
+            d.line_ref = departure['LineRef']
+            d.published_line_name = departure['PublishedLineName']
+            d.direction_ref = departure['DirectionRef']
+            # d.direction_name = departure['DirectionName']
+            # d.destination_ref = departure['DestinationRef']
+            d.destination_name = departure['DestinationName']
+            d.original_aimed_departure_time = departure['OriginAimedDepartureTime']
+            d.destination_aimed_arival_time = departure['DestinationAimedArrivalTime']
+            d.delay = departure['Delay']
+            departures.append(d)
     except Exception as e:
         logger.error(str(e))
-    return stopids
+    return DepartureResponse(d)
+
+
+def parse_xml_departures(raw):
+    sax_xmlreader = xml.sax.make_parser()
+    departure_handler = DepartureHandler()
+    stream = cStringIO.StringIO(raw)
+    try:
+        sax_xmlreader.setContentHandler(departure_handler)
+        sax_xmlreader.parse(stream)
+        stream.close()
+        return departure_handler.departure_list
+    except xml.sax.SAXParseException as e:
+        logger.error(str(e))
+
+
+def parse_stopid_for_location(raw):
+    d = parse_xml_departures(raw)
+    return DepartureResponse(d)
 
 
 def fetch_stopid_for_location(easting, northing, distance=1400):
@@ -29,11 +64,11 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
     :return:
     """
     # TODO: coordinates paramter
-    url_template = 'http://reisapi.ruter.no/Place/GetClosestStops?coordinates=(x={northing},y={easting})&proposals={proposals}&maxdistance={distance}'
+    url_template = 'http://reisapi.ruter.no/Place/GetClosestStops?coordinates=(x={easting},y={northing})&proposals={proposals}&maxdistance={distance}'
     proposals = 3
-    source_url = url_template.format(proposals=proposals, distance=distance, northing=northing, easting=easting)
+    source_url = url_template.format(proposals=proposals, distance=distance, easting=easting, northing=northing)
     logger.debug(source_url)
-    request = urllib2.Request(source_url, headers={'Accepts': 'application/json'})
+    request = urllib2.Request(source_url, headers={'Accepts': 'application/xml'})
     try:
         response = urllib2.urlopen(request)
         response_body = response.read()
@@ -53,7 +88,7 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
 
 def scan_closest_stopid_for_location(latitude, longitude):
     attempts = 0
-    distance = 5600
+    distance = 87.5
     max_attempts = 6
     stop_ids = []
     logger.debug("Converting WGS84 to UTM33 latitude={0} longitude={1}".format(latitude, longitude))
@@ -72,13 +107,13 @@ def scan_closest_stopid_for_location(latitude, longitude):
         logger.debug('scan_closest_stopid_for_location distance={0} attempt={1}'.format(distance, attempts))
         response_body, status_code = fetch_stopid_for_location(easting, northing, distance=distance)
         if status_code == 200:
-            stop_ids = parse_stopid_for_location(response_body)
+            stops = parse_stopid_for_location(response_body)
         else:
             break
-
         attempts += 1
-        distance /= 2
+        distance *= 2
 
+    stop_ids = stops.departures
     if len(stop_ids) > 0:
         return \
             stop_ids[0]
@@ -87,26 +122,8 @@ def scan_closest_stopid_for_location(latitude, longitude):
 
 
 def parse_transport_for_stop(raw):
-    json_decoder = json.JSONDecoder()
-    departures = []
-    try:
-        transports = json_decoder.decode(raw)
-        for transport in transports:
-            departure = transport['MonitoredVehicleJourney']
-            d = public_transport.Departure()
-            d.line = departure['LineRef']
-            d.line_name = departure['PublishedLineName']
-            d.direction = departure['DirectionRef']
-            d.direction_name = departure['DirectionName']
-            d.destination = departure['DestinationRef']
-            d.destination_name = departure['DestinationName']
-            d.original_aimed_departure_time = departure['OriginAimedDepartureTime']
-            d.destination_aimed_arival_time = departure['DestinationAimedArrivalTime']
-            d.delay = departure['Delay']
-            departures.append(d)
-    except Exception as e:
-        logger.error(str(e))
-    return public_transport.DepartureResponse(d)
+    d = parse_json_departures(raw)
+    return DepartureResponse(d)
 
 
 def fetch_transport_for_stop(stop_id, datetime):

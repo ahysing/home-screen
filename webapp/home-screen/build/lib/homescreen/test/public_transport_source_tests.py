@@ -9,22 +9,22 @@ class PublicTansportSourceTests(unittest.TestCase):
         self.northing_forenebu_vest = '590700'
         self.easting_fornebu_vest = '6640619'
 
+
     def tearDown(self):
         pass
 
-    def test_lookupTransportForLocaiton(self):
-        pass
 
-    def test_parseTransportForStop(self):
+    def test_parse_transport_for_stop(self):
         departures = parse_transport_for_stop(RESPONSE)
         self.assertIsNotNone(departures)
 
-    def test_parseTransportForStop_returnsResponse(self):
+
+    def test_parse_transport_for_stop_returnsResponse(self):
         departures = parse_transport_for_stop(RESPONSE)
         self.assertIsInstance(departures, DepartureResponse)
 
 
-    def test_parseStopidForLocation(self):
+    def test_parse_stopid_for_location(self):
         response = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE)
         self.assertIsNotNone(response)
         self.assertIsInstance(response, list)
