@@ -14,11 +14,11 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <div class="clock">
-          </div>
+          <section class="clock">
+          </section>
         </div>
         <div class="col-md-6">
-          <div class="mail" data-mail.url="${request.route_url('mail:calendar')}">
+          <section class="mail" data-mail.url="${request.route_url('mail:calendar')}">
             <div class="authenticate ${show_authenticate}">
               <form method="POST" action="${request.route_url('index:authenticate')}">
                 <input id="mail-username" type="email" name="username" placeholder="fornavn.etternavn@acme.com">
@@ -27,16 +27,25 @@
                 <input type="submit" value="Logg in i kalender" onclick="save_submit()">
               </form>
             </div>
-          </div>
+          </section>
         </div>
       </div>
       <div class="row">
         <div class="col-md-12">
-          <div class="forecast">
+          <section class="transport">
+            <noscript>
+              <iframe src="${request.route_url('transport:next:static')}"></iframe>
+            </noscript>
+          </section>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <section class="forecast">
             <noscript>
               <iframe src="${request.route_url('forecast:static')}"></iframe>
             </noscript>
-          </div>
+          </section>
         </div>
       </div>
       <div class="row">

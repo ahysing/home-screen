@@ -9,6 +9,7 @@ import input_validation
 import zip_place_source
 import weather_source
 import public_transport_source
+from public_transport_source import RuterException
 from .mail_source import MailSource, MsExchangeException
 import datetime
 import traceback
@@ -28,6 +29,22 @@ def my_view(request):
 
 def build_error_latlong(latitude, longitude):
     return 'location not accepted latitude={0} longitude={1}'.format(latitude, longitude)
+
+
+@view_config(route_name='transport:next:static', renderer='templates/transport_next_static.pt')
+def transport_next_static(request):
+    transport = None
+    error = None
+    # Longitude and latitude for the center of Oslo
+    latitude = u'59.5440'
+    longitude = u'10.4510'
+    try:
+        logger.debug('transport_next latitude={0} longitude={1}'.format(latitude, longitude))
+        transport = public_transport_source.lookup_transport_for_stop(latitude, longitude)
+    except RuterException as e:
+        error = str(e)
+        logger.error(str(e))
+    return {'transport': transport, 'error':error}
 
 
 @view_config(route_name='transport:next', renderer='json')
@@ -52,6 +69,20 @@ The response is the next public transport departures', 'params': ['latitude', 'l
         request.response.status = 500
         return {'error': message, 'params': ['latitude', 'longitude']}
 
+
+@view_config(route_name='forecast:static', renderer='templates/forecast_static.pt')
+def forecast_static(request):
+    icon = 'wi'
+    temperature = '0'
+    time_from = '00:00'
+    time_to = '00:00'
+    error = None
+    try:
+        forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
+    except YrException as e:
+	error = str(e)
+        logger.error(str(e))
+    return {'icon': icon, 'temperature': temperature, 'from':time_from, 'to':time_to, 'error': error}
 
 @view_config(route_name='forecast', renderer='json')
 def forecast(request):

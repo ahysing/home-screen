@@ -9,6 +9,7 @@ import input_validation
 import zip_place_source
 import weather_source
 import public_transport_source
+from public_transport_source import RuterException
 from .mail_source import MailSource, MsExchangeException
 import datetime
 import traceback
@@ -28,6 +29,22 @@ def my_view(request):
 
 def build_error_latlong(latitude, longitude):
     return 'location not accepted latitude={0} longitude={1}'.format(latitude, longitude)
+
+
+@view_config(route_name='transport:next:static', renderer='templates/transport_next_static.pt')
+def transport_next_static(request):
+    transport = None
+    error = None
+    # Longitude and latitude for the center of Oslo
+    latitude = u'59.5440'
+    longitude = u'10.4510'
+    try:
+        logger.debug('transport_next latitude={0} longitude={1}'.format(latitude, longitude))
+        transport = public_transport_source.lookup_transport_for_stop(latitude, longitude)
+    except RuterException as e:
+        error = str(e)
+        logger.error(str(e))
+    return {'transport': transport, 'error':error}
 
 
 @view_config(route_name='transport:next', renderer='json')

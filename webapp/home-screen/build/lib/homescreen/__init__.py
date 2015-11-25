@@ -21,7 +21,9 @@ def main(global_config, **settings):
     config.add_route('index:authenticate', '/index/authenticate')
     config.add_route('index:static', '/index/static')
     config.add_route('transport:next', '/transport/next')
+    config.add_route('transport:next:static', '/transport/next/static')
     config.add_route('forecast', '/forecast')
+    config.add_route('forecast:static', '/forecast/static')
     config.add_route('mail:calendar', '/mail/calendar')
 
     config.scan()

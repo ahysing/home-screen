@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="${request.locale_name}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personlig oversikt over kalender, vær og offentlig transport der du er nå">
+    <title>Busser fra Oslo S</title>
+    <!-- Bootstrap core CSS -->
+    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${request.static_url('homescreen:static/index.css')}" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+        ${request.render_static('_transport.pt', 'transport')}
+    </div>
+  </body>
+</html>

@@ -34,7 +34,7 @@ function updateForecastDisplay(elem, credit_elem, responseText) {
         }
 
         forecasts.slice(0,5).forEach(function(x, i) {
-            var container = document.createElement('div');
+            var container = document.createElement('article');
             var time_elem = document.createElement('div');
             var element = document.createElement('i');
             var temperature_elem = document.createElement('div');

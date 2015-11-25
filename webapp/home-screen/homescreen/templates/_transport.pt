@@ -1,0 +1,9 @@
+<section xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <tal:comment> http://chameleon.readthedocs.org/en/latest// </tal:comment>
+  <h1>Busser fra Oslo S</h1>
+  <article tal:repeat="it transport">
+    <p>Sist oppdatert <time tal:attributes="datetime it.time_at" tal:content="it.time_at"></time>
+    <span tal:content="it.line_number it.line_name &nbsp;&nbsp;&nbsp;&nbsp; it.line_time"></span>
+    </p>
+  </article>
+</section>

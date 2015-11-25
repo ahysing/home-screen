@@ -103,9 +103,11 @@ def scan_closest_stopid_for_location(latitude, longitude):
     except ValueError as a:
         logger.error(str(a))
     (easting, northing, zone_number, zone_letter) = utm.from_latlon(latitude_n, longitude_n)
+    easting_i = int(easting)
+    northing_i = int(northing)
     while len(stop_ids) != 1 and attempts < max_attempts:
         logger.debug('scan_closest_stopid_for_location distance={0} attempt={1}'.format(distance, attempts))
-        response_body, status_code = fetch_stopid_for_location(easting, northing, distance=distance)
+        response_body, status_code = fetch_stopid_for_location(easting_i, northing_i, distance=distance)
         if status_code == 200:
             stops = parse_stopid_for_location(response_body)
         else:

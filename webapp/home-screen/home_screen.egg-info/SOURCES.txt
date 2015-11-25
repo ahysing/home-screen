@@ -58,8 +58,11 @@ homescreen/static/w/css/weather-icons-wind.css
 homescreen/static/w/css/weather-icons-wind.min.css
 homescreen/static/w/css/weather-icons.css
 homescreen/static/w/css/weather-icons.min.css
+homescreen/templates/_transport.pt
+homescreen/templates/forecast_static.pt
 homescreen/templates/index.pt
 homescreen/templates/mytemplate.pt
+homescreen/templates/transport_next_static.pt
 homescreen/test/__init__.py
 homescreen/test/departure_handler_tests.py
 homescreen/test/input_validation_tests.py

@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Personal dashboard for email, busses and weather">
-    <title>Hjem skjerm</title>
+    <meta name="description" content="Personlig oversikt over kalender, vær og offentlig transport der du er nå">
+    <title>Aktuelt nå</title>
     <!-- Bootstrap core CSS -->
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="${request.static_url('homescreen:static/index.css')}" rel="stylesheet">
@@ -14,11 +14,11 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <div class="clock">
-          </div>
+          <section class="clock">
+          </section>
         </div>
         <div class="col-md-6">
-          <div class="mail" data-mail.url="${request.route_url('mail:calendar')}">
+          <section class="mail" data-mail.url="${request.route_url('mail:calendar')}">
             <div class="authenticate ${show_authenticate}">
               <form method="POST" action="${request.route_url('index:authenticate')}">
                 <input id="mail-username" type="email" name="username" placeholder="fornavn.etternavn@acme.com">
@@ -27,14 +27,31 @@
                 <input type="submit" value="Logg in i kalender" onclick="save_submit()">
               </form>
             </div>
-          </div>
+          </section>
         </div>
       </div>
       <div class="row">
         <div class="col-md-12">
-          <div class="forecast"></div>
-          <div class="forecast-credits"></div>
+          <section class="transport">
+            <noscript>
+              <iframe src="${request.route_url('transport:next:static')}"></iframe>
+            </noscript>
+          </section>
         </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <section class="forecast">
+            <noscript>
+              <iframe src="${request.route_url('forecast:static')}"></iframe>
+            </noscript>
+          </section>
+        </div>
+      </div>
+      <div class="row">
+        <footer class="col-md-12">
+          <div class="forecast-credits"></div>
+        </footer>
       </div>
     </div>
     <!-- binds form values to storage for next time use -->
