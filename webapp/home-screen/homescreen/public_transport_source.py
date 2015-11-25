@@ -48,11 +48,21 @@ def parse_xml_departures(raw):
         stream.close()
         return departure_handler.departure_list
     except xml.sax.SAXParseException as e:
+        import pdb
+        pdb.set_trace()
         logger.error(str(e))
 
 
 def parse_stopid_for_location(raw):
-    d = parse_xml_departures(raw)
+    d = None
+    if raw:
+        first = raw[0]
+        if first == '<':
+            d = parse_xml_departures(raw)
+        elif first in ['[', '{', '"']:
+            d = parse_json_departures(raw)
+        else:
+            raise RuterException("unknown parse format for stopID")
     return DepartureResponse(d)
 
 
@@ -68,7 +78,7 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
     proposals = 3
     source_url = url_template.format(proposals=proposals, distance=distance, easting=easting, northing=northing)
     logger.debug(source_url)
-    request = urllib2.Request(source_url, headers={'Accepts': 'application/xml'})
+    request = urllib2.Request(source_url, headers={'Accepts': 'application/xml', 'Content-Type': 'application/xml'})
     try:
         response = urllib2.urlopen(request)
         response_body = response.read()
