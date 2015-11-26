@@ -14,6 +14,7 @@ home_screen.egg-info/requires.txt
 home_screen.egg-info/top_level.txt
 homescreen/__init__.py
 homescreen/calendar_event.py
+homescreen/calendar_handler.py
 homescreen/departure_handler.py
 homescreen/input_validation.py
 homescreen/mail_source.py

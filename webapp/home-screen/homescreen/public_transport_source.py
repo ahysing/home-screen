@@ -4,7 +4,7 @@ import json
 import datetime
 import logging
 import utm
-from .public_transport import Departure, DepartureResponse
+from .public_transport import Departure
 from .departure_handler import DepartureHandler
 import cStringIO
 
@@ -35,7 +35,7 @@ def parse_json_departures(raw):
             departures.append(d)
     except Exception as e:
         logger.error(str(e))
-    return DepartureResponse(departures)
+    return departures
 
 
 def parse_xml_departures(raw):
@@ -46,7 +46,7 @@ def parse_xml_departures(raw):
         sax_xmlreader.setContentHandler(departure_handler)
         sax_xmlreader.parse(stream)
         stream.close()
-        return departure_handler.departure_list
+        return departure_handler.departures
     except xml.sax.SAXParseException as e:
         import pdb
         pdb.set_trace()
@@ -71,7 +71,7 @@ def parse_stopid_for_location(raw, content_type):
             d = parse_json_departures(raw)
         else:
             raise RuterException("unknown parse format for stopID")
-    return DepartureResponse(d)
+    return d
 
 
 def fetch_stopid_for_location(easting, northing, distance=1400):
@@ -160,7 +160,7 @@ def parse_transport_for_stop(raw, content_type):
             d = parse_json_departures(raw)
         else:
             raise RuterException("unknown parse format for stopID")
-    return DepartureResponse(d)
+    return d
 
 
 def fetch_transport_for_stop(stop_id, datetime):
