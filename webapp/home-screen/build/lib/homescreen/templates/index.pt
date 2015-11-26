@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Personlig oversikt over kalender, vær og offentlig transport der du er nå">
+    <link rel="shortcut icon" href="${request.static_url('homescreen:static/today-xxl.png')}">
     <title>Aktuelt nå</title>
     <!-- Bootstrap core CSS -->
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">

@@ -53,13 +53,21 @@ def parse_xml_departures(raw):
         logger.error(str(e))
 
 
-def parse_stopid_for_location(raw):
+def parse_stopid_for_location(raw, content_type):
     d = None
     if raw:
         first = raw[0]
-        if first == '<':
+        if content_type in ['text/xml', 'application/xml']:
+            logger.debug('content type for stopid by location. using XML')
+            d = parse_xml_departures(raw)
+        elif content_type in ['application/json']:
+            logger.debug('content type for stopid by location. using JSON')
+            d = parse_json_departures(raw)
+        elif first == '<':
+            logger.warning('unknown content type for stopid by location. Assuming XML')
             d = parse_xml_departures(raw)
         elif first in ['[', '{', '"']:
+            logger.warning('unknown content type for stopid by location. Assuming JSON')
             d = parse_json_departures(raw)
         else:
             raise RuterException("unknown parse format for stopID")
@@ -78,12 +86,13 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
     proposals = 3
     source_url = url_template.format(proposals=proposals, distance=distance, easting=easting, northing=northing)
     logger.debug(source_url)
-    request = urllib2.Request(source_url, headers={'Accepts': 'application/xml', 'Content-Type': 'application/xml'})
+    request = urllib2.Request(source_url, headers={'Accepts': 'application/xml'})
     try:
         response = urllib2.urlopen(request)
+        content_type = response.headers.get('Content-Type')
         response_body = response.read()
         status_code = response.getcode()
-        return response_body, status_code
+        return response_body, status_code, content_type
     except urllib2.HTTPError as e:
         import pdb
         pdb.set_trace()
@@ -117,9 +126,9 @@ def scan_closest_stopid_for_location(latitude, longitude):
     northing_i = int(northing)
     while len(stop_ids) != 1 and attempts < max_attempts:
         logger.debug('scan_closest_stopid_for_location distance={0} attempt={1}'.format(distance, attempts))
-        response_body, status_code = fetch_stopid_for_location(easting_i, northing_i, distance=distance)
+        response_body, status_code, content_type = fetch_stopid_for_location(easting_i, northing_i, distance=distance)
         if status_code == 200:
-            stops = parse_stopid_for_location(response_body)
+            stops = parse_stopid_for_location(response_body, content_type)
         else:
             break
         attempts += 1
@@ -148,9 +157,10 @@ def fetch_transport_for_stop(stop_id, datetime):
     request = urllib2.Request(source_url, headers={'Accepts': 'application/json'})
     try:
         response = urllib2.urlopen(request)
+        content_type = response.headers.get('Content-Type')
         response_body = response.read()
         status_code = response.getcode()
-        return response_body, status_code
+        return response_body, status_code, content_type
     except urllib2.HTTPError as e:
         logger.error(str(e))
         return None, e.getcode()

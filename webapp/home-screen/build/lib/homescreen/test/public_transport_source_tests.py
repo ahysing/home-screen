@@ -29,6 +29,13 @@ class PublicTansportSourceTests(unittest.TestCase):
         self.assertIsNotNone(response)
         self.assertIsInstance(response, list)
 
+
+    def test_parse_stopid_for_location_response_has_stop_name(self):
+        response = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE)
+        self.assertIsNotNone(response)
+        self.assertIsInstance(response, list)
+
+
 STOPID_FOR_LOCATION_RESPONSE = """\
 [{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"Marker","ShortName":"","IsHub":false,"ID":1197385,"Name":"Yterbøl","District":"Marker","PlaceType":"Stop"},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170623,"Name":"Espa E6 Syd","District":"Stange","PlaceType":"Stop"},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170624,"Name":"Espa E6 Nord","District":"Stange","PlaceType":"Stop"}]
 """

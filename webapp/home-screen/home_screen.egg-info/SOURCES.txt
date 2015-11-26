@@ -35,6 +35,7 @@ homescreen/static/mail_exchange.js
 homescreen/static/public_transport.js
 homescreen/static/theme.css
 homescreen/static/theme.min.css
+homescreen/static/today-xxl.png
 homescreen/static/w/_docs/gh-pages/api-list.html
 homescreen/static/w/_docs/gh-pages/browserconfig.xml
 homescreen/static/w/_docs/gh-pages/index.html

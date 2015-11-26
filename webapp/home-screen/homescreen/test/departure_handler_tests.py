@@ -2,11 +2,17 @@
 import unittest
 from pyramid import testing
 from homescreen.departure_handler import DepartureHandler
-
+import xml.sax
+import cStringIO
 
 def parse(raw):
-    pass
-
+    xml_reader = xml.sax.make_parser()
+    departure_handler = DepartureHandler()
+    xml_reader.setContentHandler(departure_handler)
+    stream = cStringIO.StringIO(raw)
+    xml_reader.parse(stream)
+    xml_reader.close()
+    return departure_handler.departure_list
 
 class DepartureHandlerTests(unittest.TestCase):
     def setUp(self):

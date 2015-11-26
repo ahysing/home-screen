@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="pyramid web application">
     <meta name="author" content="Pylons Project">
-    <link rel="shortcut icon" href="${request.static_url('homescreen:static/pyramid-16x16.png')}">
+    <link rel="shortcut icon" href="${request.static_url('homescreen:static/today-xxl.png')}">
     <title></title>
     <!-- Bootstrap core CSS -->
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">

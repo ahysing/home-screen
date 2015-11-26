@@ -7,11 +7,15 @@ logger = logging.getLogger(__name__)
 
 class DepartureHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
+        self.in_delay = False
+        self.in_destination_name = False
+        self.in_destination_platform_name = False
+        self.in_line_ref = False
         self.in_monitored_stop_visit = False
-        self.in_monitored_vechicle_journey = False
+        self.in_monitored_vehicle_journey = False
         self.in_expected_departure_time = False
         self.in_destination_display = False
-        self.in_delay = False
+        self.in_vehicle_mode = False
         self.expected_departure_time = None
         self.destination_name = None
         self.destination_platform_name = None
@@ -42,9 +46,9 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         if name == 'MonitoredStopVisit':
             self.in_monitored_stop_visit = True
         elif name == 'MonitoredVehicleJourney':
-            self.in_monitored_vechicle_journey = True
+            self.in_monitored_vehicle_journey = True
         else:
-            if self.in_monitored_stop_visit and self.in_monitored_vechicle_journey:
+            if self.in_monitored_stop_visit and self.in_monitored_vehicle_journey:
                 if name == 'Delay':
                     self.in_delay = attrs.get('i:nil', 'false') == 'true'
                 elif name == 'DestinationName':
@@ -71,11 +75,12 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
 
             self.departure_list.append(d)
         else:
+            self.in_delay = False
+            self.in_destination_name = False
+            self.in_destination_platform_name = False
+            self.in_line_ref = False
             self.in_monitored_stop_visit = False
-            self.in_monitored_vechicle_journey = False
+            self.in_monitored_vehicle_journey = False
             self.in_expected_departure_time = False
             self.in_destination_display = False
-            self.in_line_ref = False
             self.in_vehicle_mode = False
-
-

@@ -8,26 +8,45 @@ class PublicTansportSourceTests(unittest.TestCase):
         # <Place i:type="Stop"><District>Bærum</District><ID>2190017</ID><Name>Fornebu vest</Name><PlaceType i:nil="true"/><IsHub>false</IsHub><ShortName>FBUV</ShortName><X>590700</X><Y>6640619</Y><Zone>1</Zone></Place>
         self.northing_forenebu_vest = '590700'
         self.easting_fornebu_vest = '6640619'
+        self.json = 'application/json'
+        self.xml = 'application/xml'
 
 
     def tearDown(self):
         pass
 
 
+    def test_parse_stopid_for_location_xml(self):
+        departures = parse_stopid_for_location(XML_RESPONSE, self.xml)
+        self.assertIsNotNone(departures)
+
+
+    def test_parse_stopid_for_location(self):
+        departures = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
+        self.assertIsNotNone(departures)
+
+
     def test_parse_transport_for_stop(self):
-        departures = parse_transport_for_stop(RESPONSE)
+        departures = parse_transport_for_stop(RESPONSE, self.json)
         self.assertIsNotNone(departures)
 
 
     def test_parse_transport_for_stop_returnsResponse(self):
-        departures = parse_transport_for_stop(RESPONSE)
+        departures = parse_transport_for_stop(RESPONSE, self.json)
         self.assertIsInstance(departures, DepartureResponse)
 
 
     def test_parse_stopid_for_location(self):
-        response = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE)
+        response = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
         self.assertIsNotNone(response)
         self.assertIsInstance(response, list)
+
+
+    def test_parse_stopid_for_location_response_has_stop_name(self):
+        response = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
+        self.assertIsNotNone(response)
+        self.assertIsInstance(response, list)
+
 
 STOPID_FOR_LOCATION_RESPONSE = """\
 [{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"Marker","ShortName":"","IsHub":false,"ID":1197385,"Name":"Yterbøl","District":"Marker","PlaceType":"Stop"},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170623,"Name":"Espa E6 Syd","District":"Stange","PlaceType":"Stop"},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170624,"Name":"Espa E6 Nord","District":"Stange","PlaceType":"Stop"}]
@@ -174,3 +193,5 @@ RESPONSE = """\
   }
 ]
 """
+
+XML_RESPONSE = "<ArrayOfDepartures></ArrayOfDepartures>"
