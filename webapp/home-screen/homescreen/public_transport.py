@@ -9,6 +9,20 @@ class DepartureResponse(object):
         return {'departures': self.departures}
 
 
+class Stop(object):
+    def __init__(self):
+        self.x = None
+        self.y = None
+        self.id = None
+        self.name = None
+        self.zone = None
+        self.is_hub = False
+
+
+    def __json__(self, request):
+        return {'id':self.id, 'name': self.name, 'zone':self.zone, 'is_hub':self.is_hub, 'y':self.y, 'x':self.x}
+
+
 class Departure(object):
     def __init__(self):
         self.line_ref = None

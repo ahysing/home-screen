@@ -63,7 +63,7 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         else:
             if self.in_monitored_stop_visit and self.in_monitored_vehicle_journey:
                 if name == 'Delay':
-                    self.in_delay = attrs.get('i:nil', 'false') == 'true'
+                    self.in_delay = True
                 elif name == 'DestinationName':
                     self.in_destination_name = True
                 elif name == 'DestinationAimedArrivalTime':
