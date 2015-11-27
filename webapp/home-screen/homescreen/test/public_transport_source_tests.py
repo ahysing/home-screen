@@ -47,7 +47,7 @@ class PublicTansportSourceTests(unittest.TestCase):
         self.assertNotEqual(0, len(response))
 
 
-    def test_(self):
+    def test_fetch_transport_for_stop(self):
         pass
 
 

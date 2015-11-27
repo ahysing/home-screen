@@ -26,6 +26,7 @@ def parse_xml_stops(raw):
         stream.close()
         return stop_handler.stops
     except xml.sax.SAXParseException as e:
+        logger.error(str(e))
         raise RuterException(e)
 
 
@@ -41,9 +42,14 @@ def parse_json_stops(raw):
             s.is_hub = stop['IsHub'] == 'True'
             s.x = stop['X']
             s.y = stop['Y']
+            s.id = stop['ID']
             stops.append(s)
+    except KeyError as e:
+        logger.error(str(e))
+        raise RuterException(e)
     except ValueError as e:
         logger.error(str(e))
+        raise RuterException(e)
     return stops
 
 
@@ -70,13 +76,11 @@ def parse_json_departures(raw):
 
             departures.append(d)
     except KeyError as e:
-        import pdb
-        pdb.set_trace()
         logger.error(str(e))
+        raise RuterException(e)
     except ValueError as e:
-        import pdb
-        pdb.set_trace()
         logger.error(str(e))
+        raise RuterException(e)
     return departures
 
 
@@ -150,15 +154,16 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
 def scan_closest_stopid_for_location(latitude, longitude):
     attempts = 0
     distance = 87.5
-    max_attempts = 6
+    max_attempts = 4
     stop_ids = []
     logger.debug("Converting WGS84 to UTM33 latitude={0} longitude={1}".format(latitude, longitude))
     latitude_n = 0
     longitude_n = 0
     try:
         latitude_n = float(latitude)
-    except ValueError as a:
-        logger.error(str(a))
+    except ValueError as e:
+        logger.error(str(e))
+
     try:
         longitude_n = float(longitude)
     except ValueError as a:
@@ -215,6 +220,8 @@ def fetch_transport_for_stop(stop, datetime):
         status_code = response.getcode()
         return response_body, status_code, content_type
     except urllib2.HTTPError as e:
+        import pdb
+        pdb.set_trace()
         logger.error(str(e))
         return None, e.getcode()
     except urllib2.URLError as e:
@@ -235,10 +242,10 @@ def lookup_transport_for_stop(latitude, longitude):
     """
     logger.debug('lookup_transport_for_stop latitude={0} longitude={1}'.format(latitude, longitude))
     transports = []
-    stop_ids = scan_closest_stopid_for_location(latitude, longitude)
-    if stop_ids:
+    stops = scan_closest_stopid_for_location(latitude, longitude)
+    if stops:
         now_text = datetime.datetime.now().isoformat()
-        for sid in stop_ids:
-            transport_list = fetch_transport_for_stop(sid, now_text)
-            transports = transports.extend(transport_list)
+        for s in stops:
+            transport_list = fetch_transport_for_stop(s, now_text)
+            transports.extend(transport_list)
     return transports

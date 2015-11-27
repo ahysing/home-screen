@@ -19,22 +19,38 @@ function updateTransportDisplay(elem, text) {
     'use strict';
     if (elem !== undefined) {
         var transports = JSON.parse(text);
-        var container = document.createElement('div');
-        container.setAttribute('class', 'transport');
+        if (transports) {
+            var container = document.createElement('div');
+            container.setAttribute('class', 'transport');
 
-        while (elem.hasChildNodes()) {
-            elem.removeChild(node.lastChild);
+            while (elem.hasChildNodes()) {
+                elem.removeChild(elem.lastChild);
+            }
+
+            var trips = transports['departures'];
+            trips.forEach(function(x) {
+                var route = document.createElement('article');
+                var icon = document.createElement('img');
+                var mode = x['vehicle_mode'];
+                var icon_link = '';
+                switch(mode) {
+                    case 'bus':
+                        icon_link = '/static/bus.png';
+                        break;
+                    default:
+                        break;
+
+                }
+                icon.setAttribute('href', icon_link);
+                icon.setAttribute('alt', 'Mode of transport for departure');
+                route.setAttribute('class', 'transport');
+                route.innerText = x['line_name'] + '    ' + x['destination_aimed_arrival_time'];
+                container.appendChild(icon);
+                container.appendChild(route);
+            });
+
+            elem.appendChild(container);
         }
-
-        var trips = transports['departures'];
-        trips.forEach(function(x) {
-            var route = document.createElement('div');
-            route.setAttribute('class', 'transport');
-            route.innerText = x['line_name'] + '    ' + x['destination_aimed_arrival_time'];
-            container.appendChild(route);
-        });
-
-        elem.appendChild(container);
     }
 }
 
@@ -45,7 +61,7 @@ function requestTransportForLocation(e) {
         'use strict';
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
-                updateTransportDisplay(pt_object.element, xhr.innerText);
+                updateTransportDisplay(pt_object.element, xhr.responseText);
             } else {
                 console.log('transport response status ' + xhr.status);
             }

@@ -23,7 +23,7 @@ function updateTransportDisplay(elem, text) {
         container.setAttribute('class', 'transport');
 
         while (elem.hasChildNodes()) {
-            elem.removeChild(node.lastChild);
+            elem.removeChild(elem.lastChild);
         }
 
         var trips = transports['departures'];
@@ -45,7 +45,7 @@ function requestTransportForLocation(e) {
         'use strict';
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
-                updateTransportDisplay(pt_object.element, xhr.innerText);
+                updateTransportDisplay(pt_object.element, xhr.responseText);
             } else {
                 console.log('transport response status ' + xhr.status);
             }
