@@ -1,5 +1,6 @@
 import xml, xml.sax
 import logging
+
 from .public_transport import Departure
 
 logger = logging.getLogger(__name__)
@@ -18,11 +19,13 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         self.in_vehicle_mode = False
         self.in_destination_aimed_arrival_time = False
         self.in_direction_name = False
+        self.in_original_aimed_departure_time = False
         self.set_fields_none()
         self.departures = []
 
 
     def set_fields_none(self):
+        self.original_aimed_departure_time = None
         self.destination_aimed_arrival_time = None
         self.expected_departure_time = None
         self.destination_name = None
@@ -41,6 +44,8 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
             self.expected_departure_time = content
         elif self.in_destination_platform_name:
             self.destination_platform_name = content
+        elif self.in_original_aimed_departure_time:
+            self.original_aimed_departure_time = content
         elif self.in_destination_aimed_arrival_time:
             self.destination_aimed_arrival_time = content
         elif self.in_destination_display:
@@ -66,6 +71,8 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
                     self.in_delay = True
                 elif name == 'DestinationName':
                     self.in_destination_name = True
+                elif name == 'OriginAimedDepartureTime':
+                    self.in_original_aimed_departure_time = True
                 elif name == 'DestinationAimedArrivalTime':
                     self.in_destination_aimed_arrival_time = True
                 elif name == 'DirectionName':
@@ -114,3 +121,6 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
             self.in_line_ref = False
         elif name == 'VehicleMode':
             self.in_vehicle_mode = False
+        elif name == 'OriginalAimedArrivalTime':
+            self.in_original_aimed_departure_time = False
+

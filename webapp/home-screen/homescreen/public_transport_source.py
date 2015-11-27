@@ -52,23 +52,30 @@ def parse_json_departures(raw):
     departures = []
     try:
         transports = json_decoder.decode(raw)
-        import pdb
-        pdb.set_trace()
         for transport in transports:
             d = Departure()
+
             monitored_vehicle_journey = transport['MonitoredVehicleJourney']
             d.line_ref = monitored_vehicle_journey['LineRef']
             d.direction_ref = monitored_vehicle_journey['DirectionRef']
-            monitor_call = transport['MonitoredCall']
+            d.published_line_name = monitored_vehicle_journey['PublishedLineName']
+            d.direction_name = monitored_vehicle_journey['DirectionName']
+            d.destination_name = monitored_vehicle_journey['DestinationName']
+            d.original_aimed_departure_time = monitored_vehicle_journey['OriginAimedDepartureTime']
+            d.destination_aimed_arrival_time = monitored_vehicle_journey['DestinationAimedArrivalTime']
+            d.delay = monitored_vehicle_journey['Delay']
+
+            monitor_call = monitored_vehicle_journey['MonitoredCall']
             d.destination_aimed_arrival_time = monitor_call['AimedArrivalTime']
-            d.published_line_name = transport['PublishedLineName']
-            d.direction_name = transport['DirectionName']
-            d.published_line_name = transport['PublishedLineName']
-            d.destination_name = transport['DestinationName']
-            d.original_aimed_departure_time = transport['OriginAimedDepartureTime']
-            d.delay = transport['Delay']
+
             departures.append(d)
+    except KeyError as e:
+        import pdb
+        pdb.set_trace()
+        logger.error(str(e))
     except ValueError as e:
+        import pdb
+        pdb.set_trace()
         logger.error(str(e))
     return departures
 
@@ -164,10 +171,9 @@ def scan_closest_stopid_for_location(latitude, longitude):
         response_body, status_code, content_type = fetch_stopid_for_location(easting_i, northing_i, distance=distance)
         if status_code == 200:
             stop_ids = parse_stopid_for_location(response_body, content_type)
-        else:
-            break
         attempts += 1
-        distance *= 2
+        for i in range(attempts):
+            distance *= 2
     return stop_ids
 
 
