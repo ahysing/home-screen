@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 class RuterException(Exception):
     pass
 
+
 def parse_xml_stops(raw):
     xml_reader = xml.sax.make_parser()
     stream = cStringIO.StringIO(raw)
@@ -194,7 +195,7 @@ def parse_transport_for_stop(raw, content_type):
 
 def fetch_transport_for_stop(stop, datetime):
     url_template = 'http://reisapi.ruter.no/StopVisit/GetDepartures/{id}?datetime={datetime}'
-    #transporttypes = ''  AirportBus,Bus,AirportTrain,Train,Boat,Metro,Tram,""
+    # transporttypes = ''  AirportBus,Bus,AirportTrain,Train,Boat,Metro,Tram,""
     # linenames = '' T6,1,2,5,""
     stop_id = stop.id
     logger.debug('fetch_transport_for_stop stopid={0} datetime={1}'.format(stop_id, datetime))
@@ -233,5 +234,5 @@ def lookup_transport_for_stop(latitude, longitude):
         now_text = datetime.datetime.now().isoformat()
         for sid in stop_ids:
             transport_list = fetch_transport_for_stop(sid, now_text)
-            transports = transports.join(transport_list)
+            transports = transports.extend(transport_list)
     return transports

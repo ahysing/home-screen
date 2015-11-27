@@ -21,6 +21,7 @@ homescreen/mail_source.py
 homescreen/models.py
 homescreen/public_transport.py
 homescreen/public_transport_source.py
+homescreen/stop_handler.py
 homescreen/tests.py
 homescreen/views.py
 homescreen/weather.py
@@ -70,5 +71,6 @@ homescreen/test/departure_handler_tests.py
 homescreen/test/input_validation_tests.py
 homescreen/test/mail_source_tests.py
 homescreen/test/public_transport_source_tests.py
+homescreen/test/stop_handler_tests.py
 homescreen/test/weather_source_tests.py
 homescreen/test/zip_place_source_tests.py

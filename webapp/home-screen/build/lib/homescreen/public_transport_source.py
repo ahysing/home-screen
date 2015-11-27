@@ -6,6 +6,7 @@ import logging
 import utm
 from .public_transport import Departure, Stop
 from .departure_handler import DepartureHandler
+from .stop_handler import StopHandler
 import cStringIO
 
 logger = logging.getLogger(__name__)
@@ -13,6 +14,19 @@ logger = logging.getLogger(__name__)
 
 class RuterException(Exception):
     pass
+
+def parse_xml_stops(raw):
+    xml_reader = xml.sax.make_parser()
+    stream = cStringIO.StringIO(raw)
+    stop_handler = StopHandler()
+    xml_reader.setContentHandler(stop_handler)
+    try:
+        xml_reader.parse(stream)
+        stream.close()
+        return stop_handler.stops
+    except xml.sax.SAXParseException as e:
+        raise RuterException(e)
+
 
 def parse_json_stops(raw):
     json_decoder = json.JSONDecoder()
@@ -22,12 +36,15 @@ def parse_json_stops(raw):
         for stop in response:
             s = Stop()
             s.name = stop['Name']
-            s.zone = stop['zone']
+            s.zone = stop['Zone']
             s.is_hub = stop['IsHub'] == 'True'
+            s.x = stop['X']
+            s.y = stop['Y']
             stops.append(s)
-    except Exception as e:
+    except ValueError as e:
         logger.error(str(e))
     return stops
+
 
 def parse_json_departures(raw):
     json_decoder = json.JSONDecoder()
@@ -50,7 +67,7 @@ def parse_json_departures(raw):
             d.original_aimed_departure_time = transport['OriginAimedDepartureTime']
             d.delay = transport['Delay']
             departures.append(d)
-    except Exception as e:
+    except ValueError as e:
         logger.error(str(e))
     return departures
 
@@ -76,13 +93,13 @@ def parse_stopid_for_location(raw, content_type):
         first = raw[0]
         if content_type in ['text/xml', 'application/xml']:
             logger.debug('content type for stopid by location. using XML')
-            d = parse_xml_departures(raw)
+            d = parse_xml_stops(raw)
         elif content_type in ['application/json']:
             logger.debug('content type for stopid by location. using JSON')
             d = parse_json_stops(raw)
         elif first == '<':
             logger.warning('unknown content type for stopid by location. Assuming XML')
-            d = parse_xml_departures(raw)
+            d = parse_xml_stops(raw)
         elif first in ['[', '{', '"']:
             logger.warning('unknown content type for stopid by location. Assuming JSON')
             d = parse_json_stops(raw)
@@ -150,12 +167,8 @@ def scan_closest_stopid_for_location(latitude, longitude):
             break
         attempts += 1
         distance *= 2
+    return stop_ids
 
-    if len(stop_ids) > 0:
-        return \
-            stop_ids[0]
-    else:
-        return None
 
 # deprecated: unused
 def parse_transport_for_stop(raw, content_type):
@@ -179,10 +192,11 @@ def parse_transport_for_stop(raw, content_type):
     return d
 
 
-def fetch_transport_for_stop(stop_id, datetime):
+def fetch_transport_for_stop(stop, datetime):
     url_template = 'http://reisapi.ruter.no/StopVisit/GetDepartures/{id}?datetime={datetime}'
     #transporttypes = ''  AirportBus,Bus,AirportTrain,Train,Boat,Metro,Tram,""
     # linenames = '' T6,1,2,5,""
+    stop_id = stop.id
     logger.debug('fetch_transport_for_stop stopid={0} datetime={1}'.format(stop_id, datetime))
     source_url = url_template.format(id=stop_id, datetime=datetime)
     logger.debug(source_url)
@@ -213,9 +227,11 @@ def lookup_transport_for_stop(latitude, longitude):
     :return:
     """
     logger.debug('lookup_transport_for_stop latitude={0} longitude={1}'.format(latitude, longitude))
-    stop_id = scan_closest_stopid_for_location(latitude, longitude)
-    if stop_id:
+    transports = []
+    stop_ids = scan_closest_stopid_for_location(latitude, longitude)
+    if stop_ids:
         now_text = datetime.datetime.now().isoformat()
-        return fetch_transport_for_stop(stop_id, now_text)
-    else:
-        return None
+        for sid in stop_ids:
+            transport_list = fetch_transport_for_stop(sid, now_text)
+            transports = transports.join(transport_list)
+    return transports
