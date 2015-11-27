@@ -8,8 +8,10 @@ class InputValidationTests(unittest.TestCase):
     def setUp(self):
         pass
 
+
     def tearDown(self):
         pass
+
 
     def test_is_valid_postnummer(self):
         postnummer_large = '10000'
@@ -32,6 +34,7 @@ class InputValidationTests(unittest.TestCase):
         postnumber_zeropadded_is_valid = is_valid_postnummer(postnumber_zeropadded)
         self.assertTrue(postnumber_zeropadded_is_valid, 'Postnumber 0001 might be an actual postnumber and should pass')
 
+
     def test_is_valid_wgs84_oslo(self):
         # Position source
         # 59° 55' 0" N / 10° 45' 0" E
@@ -41,6 +44,7 @@ class InputValidationTests(unittest.TestCase):
         position_oslo_is_valid = is_valid_wgs_84(latitude_oslo, longitude_oslo)
         self.assertTrue(position_oslo_is_valid, 'Latitude and Longitude of Oslo is valid')
 
+
     def test_is_valid_wgs_84_bouvet(self):
         # Position source
         # 54°26′48″S 3°21′13″E
@@ -49,6 +53,7 @@ class InputValidationTests(unittest.TestCase):
         position_bouvet_is_valid = is_valid_wgs_84(latitude_bouvet, longitude_bouvet)
         self.assertTrue(position_bouvet_is_valid, 'Latitude and Longitude of Bouvet is valid')
 
+
     def test_is_valid_wgs_84_formBrowser(self):
         # Position source
         # 54°26′48″S 3°21′13″E
@@ -56,5 +61,3 @@ class InputValidationTests(unittest.TestCase):
         longitude = '10.617284399999999'
         position_is_valid = is_valid_wgs_84(latitude, longitude)
         self.assertTrue(position_is_valid, 'Latitude and Longitude of Bouvet is valid')
-
-# http://localhost:6543/forecast?latitude=59.892136400000005&longitude=10.617284399999999

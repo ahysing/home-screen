@@ -6,6 +6,7 @@ import logging
 import utm
 from .public_transport import Departure, Stop
 from .departure_handler import DepartureHandler
+from .stop_handler import StopHandler
 import cStringIO
 
 logger = logging.getLogger(__name__)
@@ -14,16 +15,18 @@ logger = logging.getLogger(__name__)
 class RuterException(Exception):
     pass
 
-class stop_handler(xml.sax.ContentHandler):
-    def __init__(self):
-        self.name = None
-        self.zone = None
-        self.is_hub = False
-        self.x = None
-        self.y = None
-
 def parse_xml_stops(raw):
-    raise Exception()
+    xml_reader = xml.sax.make_parser()
+    stream = cStringIO.StringIO(raw)
+    stop_handler = StopHandler()
+    xml_reader.setContentHandler(stop_handler)
+    try:
+        xml_reader.parse(stream)
+        stream.close()
+        return stop_handler.stops
+    except xml.sax.SAXParseException as e:
+        raise RuterException(e)
+
 
 def parse_json_stops(raw):
     json_decoder = json.JSONDecoder()
@@ -33,12 +36,15 @@ def parse_json_stops(raw):
         for stop in response:
             s = Stop()
             s.name = stop['Name']
-            s.zone = stop['zone']
+            s.zone = stop['Zone']
             s.is_hub = stop['IsHub'] == 'True'
+            s.x = stop['X']
+            s.y = stop['Y']
             stops.append(s)
-    except Exception as e:
+    except ValueError as e:
         logger.error(str(e))
     return stops
+
 
 def parse_json_departures(raw):
     json_decoder = json.JSONDecoder()
@@ -61,7 +67,7 @@ def parse_json_departures(raw):
             d.original_aimed_departure_time = transport['OriginAimedDepartureTime']
             d.delay = transport['Delay']
             departures.append(d)
-    except Exception as e:
+    except ValueError as e:
         logger.error(str(e))
     return departures
 
@@ -87,13 +93,13 @@ def parse_stopid_for_location(raw, content_type):
         first = raw[0]
         if content_type in ['text/xml', 'application/xml']:
             logger.debug('content type for stopid by location. using XML')
-            d = parse_xml_departures(raw)
+            d = parse_xml_stops(raw)
         elif content_type in ['application/json']:
             logger.debug('content type for stopid by location. using JSON')
             d = parse_json_stops(raw)
         elif first == '<':
             logger.warning('unknown content type for stopid by location. Assuming XML')
-            d = parse_xml_departures(raw)
+            d = parse_xml_stops(raw)
         elif first in ['[', '{', '"']:
             logger.warning('unknown content type for stopid by location. Assuming JSON')
             d = parse_json_stops(raw)

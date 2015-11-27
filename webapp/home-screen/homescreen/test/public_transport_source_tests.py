@@ -8,7 +8,7 @@ class PublicTansportSourceTests(unittest.TestCase):
         # <Place i:type="Stop"><District>Bærum</District><ID>2190017</ID><Name>Fornebu vest</Name><PlaceType i:nil="true"/><IsHub>false</IsHub><ShortName>FBUV</ShortName><X>590700</X><Y>6640619</Y><Zone>1</Zone></Place>
         self.northing_forenebu_vest = '590700'
         self.easting_fornebu_vest = '6640619'
-        self.json = 'application/json'
+        self.json = 'application/xjson'
         self.xml = 'application/xml'
 
 
