@@ -3,3 +3,5 @@ source environment_name/bin/activate
 pcreate -s alchemy home-screen
 python setup.py develop
 pserve development.ini
+sudo pip install appengine-sdk 
+installed and ran https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python
