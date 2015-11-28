@@ -26,6 +26,7 @@ homescreen/tests.py
 homescreen/views.py
 homescreen/weather.py
 homescreen/weather_source.py
+homescreen/webutils.py
 homescreen/zip_place.py
 homescreen/zip_place_source.py
 homescreen/scripts/__init__.py
@@ -38,6 +39,11 @@ homescreen/static/public_transport.js
 homescreen/static/theme.css
 homescreen/static/theme.min.css
 homescreen/static/today-xxl.png
+homescreen/static/icon/boat.png
+homescreen/static/icon/bus.png
+homescreen/static/icon/plane.png
+homescreen/static/icon/train.png
+homescreen/static/icon/unknown.png
 homescreen/static/w/_docs/gh-pages/api-list.html
 homescreen/static/w/_docs/gh-pages/browserconfig.xml
 homescreen/static/w/_docs/gh-pages/index.html

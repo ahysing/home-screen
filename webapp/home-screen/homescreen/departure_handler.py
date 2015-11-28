@@ -19,7 +19,9 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         self.in_vehicle_mode = False
         self.in_destination_aimed_arrival_time = False
         self.in_direction_name = False
+        self.in_direction_ref = False
         self.in_original_aimed_departure_time = False
+
         self.set_fields_none()
         self.departures = []
 
@@ -32,6 +34,7 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         self.destination_platform_name = None
         self.destination_display = None
         self.direction_name = None
+        self.direction_ref = None
         self.line_ref = None
         self.vehicle_mode = None
         self.delay = None
@@ -52,6 +55,8 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
             self.destination_display = content
         elif self.in_direction_name:
             self.direction_name = content
+        elif self.in_direction_ref:
+            self.direction_ref = content
         elif self.in_line_ref:
             self.line_ref = content
         elif self.in_vehicle_mode:
@@ -77,13 +82,16 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
                     self.in_destination_aimed_arrival_time = True
                 elif name == 'DirectionName':
                     self.in_direction_name = True
+                elif name == 'DirectionRef':
+                    self.in_direction_ref = True
                 elif name == 'ExpectedDepartureTime':
                     self.in_expected_departure_time = True
                 elif name == 'LineRef':
                     self.in_line_ref = True
                 elif name == 'VehicleMode':
                     self.in_vehicle_mode = True
-
+                elif name == 'DestinationDisplay':
+                    self.in_destination_display = True
 
 
     def push_all_fields(self):
@@ -95,6 +103,7 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         d.destination_display = self.destination_display
         d.destination_platform_name = self.destination_platform_name
         d.direction_name = self.direction_name
+        d.direction_ref = self.direction_ref
         d.line_ref = self.line_ref
         d.vehicle_mode = self.vehicle_mode
         self.departures.append(d)
@@ -111,10 +120,14 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
             self.in_delay = False
         elif name == 'DestinationName':
             self.in_destination_name = False
+        elif name == 'DestinationDisplay':
+            self.in_destination_display = False
         elif name == 'DestinationAimedArrivalTime':
             self.in_destination_aimed_arrival_time = False
         elif name == 'DirectionName':
             self.in_direction_name = False
+        elif name == 'DirectionRef':
+            self.in_direction_ref = False
         elif name == 'ExpectedDepartureTime':
             self.in_expected_departure_time = False
         elif name == 'LineRef':

@@ -12,7 +12,7 @@
     <header>
       <h1>Været for Oslo</h1>
     </header>
-    <article class="wather-container">
+    <article class="wather-container" tabindex="-1">
       <i class="{icon}"></i>
       <div class="temperature">{temperature}°</div>
       <div class="time">{from} til {to}</div>
@@ -25,14 +25,14 @@ body {
   color: #ffffff;
   background: #bc2131;
 }
-      article {
-        width: 180px;
-        height: 64px;
-      }
-      h1 {
-        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-weight: 300;
-      }
+article {
+  width: 180px;
+  height: 64px;
+}
+h1 {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 300;
+}
 .forecast {
   font-size: 1000%;
   font-weight: bold;

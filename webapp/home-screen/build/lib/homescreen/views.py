@@ -11,6 +11,7 @@ import weather_source
 import public_transport_source
 from public_transport_source import RuterException
 from .mail_source import MailSource, MsExchangeException
+from .weather_source import YrException
 import datetime
 import traceback
 import logging
@@ -38,9 +39,10 @@ def transport_next_static(request):
     # Longitude and latitude for the center of Oslo
     latitude = u'59.5440'
     longitude = u'10.4510'
+    limit = 10
     try:
         logger.debug('transport_next latitude={0} longitude={1}'.format(latitude, longitude))
-        transport = public_transport_source.lookup_transport_for_stop(latitude, longitude)
+        transport = public_transport_source.lookup_transport_for_stop(latitude, longitude, limit=limit)
     except RuterException as e:
         error = str(e)
         logger.error(str(e))
@@ -49,25 +51,39 @@ def transport_next_static(request):
 
 @view_config(route_name='transport:next', renderer='json')
 def transport_next(request):
+    error = None
     try:
         if 'latitude' in request.GET and 'longitude' in request.GET:
             latitude = request.GET['latitude']
             longitude = request.GET['longitude']
+            limit = None
+            try:
+                limit = request.GET['limit']
+                limit = int(limit)
+            except KeyError:
+                pass
+            except ValueError:
+                error = 'Invalid limit sent to service. Expected integer got {}'.format(limit)
             if not input_validation.is_valid_wgs_84(latitude, longitude):
                 request.response.status = 400
                 return {'error': build_error_latlong(latitude, longitude), 'params': ['latitude', 'longitude']}
             else:
-                logger.debug('transport_next latitude={0} longitude={1}'.format(latitude, longitude))
-                transport = public_transport_source.lookup_transport_for_stop(latitude, longitude)
-                return {'error': None, 'transport': transport}
+                if type(limit) == int:
+                    logger.debug('transport_next latitude={0} longitude={1} limit={2}'.format(latitude, longitude, limit))
+                    transport = public_transport_source.lookup_transport_for_stop(latitude, longitude, limit=limit)
+                else:
+                    logger.debug('transport_next latitude={0} longitude={1}'.format(latitude, longitude))
+                    transport = public_transport_source.lookup_transport_for_stop(latitude, longitude)
+                return {'error': error, 'transport': transport}
         else:
             return {'info': 'Pass parameters latitude, longitude. \
-The response is the next public transport departures', 'params': ['latitude', 'longitude']}
-    except Exception as e:
+The response is the next public transport departures. Optionally pass limit for fewer items.',
+                    'params': ['latitude', 'longitude', 'limit']}
+    except RuterException as e:
         logger.error(traceback.print_exc())
         message = str(e)
         request.response.status = 500
-        return {'error': message, 'params': ['latitude', 'longitude']}
+        return {'error': message, 'params': ['latitude', 'longitude', 'limit']}
 
 
 @view_config(route_name='forecast:static', renderer='templates/forecast_static.pt')
@@ -77,6 +93,7 @@ def forecast_static(request):
     time_from = '00:00'
     time_to = '00:00'
     error = None
+    postnummer = '0250' # Aker Brygge per november 2015
     try:
         forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
     except YrException as e:

@@ -4,10 +4,12 @@ import json
 import datetime
 import logging
 import utm
-from .public_transport import Departure, Stop
+from .webutils import get_content_type
+from .public_transport import Departure, Stop, DepartureResponse
 from .departure_handler import DepartureHandler
 from .stop_handler import StopHandler
 import cStringIO
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -54,33 +56,33 @@ def parse_json_stops(raw):
 
 
 def parse_json_departures(raw):
-    json_decoder = json.JSONDecoder()
     departures = []
-    try:
-        transports = json_decoder.decode(raw)
-        for transport in transports:
+    json_decoder = json.JSONDecoder()
+    transports = json_decoder.decode(raw)
+    for transport in transports:
+        try:
             d = Departure()
-
             monitored_vehicle_journey = transport['MonitoredVehicleJourney']
+            d.vehicle_mode = monitored_vehicle_journey['VehicleMode']
             d.line_ref = monitored_vehicle_journey['LineRef']
             d.direction_ref = monitored_vehicle_journey['DirectionRef']
             d.published_line_name = monitored_vehicle_journey['PublishedLineName']
             d.direction_name = monitored_vehicle_journey['DirectionName']
             d.destination_name = monitored_vehicle_journey['DestinationName']
-            d.original_aimed_departure_time = monitored_vehicle_journey['OriginAimedDepartureTime']
             d.destination_aimed_arrival_time = monitored_vehicle_journey['DestinationAimedArrivalTime']
+            d.original_aimed_departure_time = monitored_vehicle_journey['OriginAimedDepartureTime']
             d.delay = monitored_vehicle_journey['Delay']
 
             monitor_call = monitored_vehicle_journey['MonitoredCall']
             d.destination_aimed_arrival_time = monitor_call['AimedArrivalTime']
-
+            d.destination_display = monitor_call['DestinationDisplay']
             departures.append(d)
-    except KeyError as e:
-        logger.error(str(e))
-        raise RuterException(e)
-    except ValueError as e:
-        logger.error(str(e))
-        raise RuterException(e)
+        except KeyError as e:
+            logger.error(str(e))
+            raise RuterException(e)
+        except ValueError as e:
+            logger.error(str(e))
+            raise RuterException(e)
     return departures
 
 
@@ -94,19 +96,17 @@ def parse_xml_departures(raw):
         stream.close()
         return departure_handler.departures
     except xml.sax.SAXParseException as e:
-        import pdb
-        pdb.set_trace()
         logger.error(str(e))
-
+        raise RuterException(e)
 
 def parse_stopid_for_location(raw, content_type):
     d = None
     if raw:
         first = raw[0]
-        if content_type in ['text/xml', 'application/xml']:
+        if content_type in ['text/xml', 'text/xml; charset=utf-8', 'application/xml', 'application/xml; charset=utf-8']:
             logger.debug('content type for stopid by location. using XML')
             d = parse_xml_stops(raw)
-        elif content_type in ['application/json']:
+        elif content_type in ['application/json', 'application/json; charset=utf-8']:
             logger.debug('content type for stopid by location. using JSON')
             d = parse_json_stops(raw)
         elif first == '<':
@@ -116,6 +116,7 @@ def parse_stopid_for_location(raw, content_type):
             logger.warning('unknown content type for stopid by location. Assuming JSON')
             d = parse_json_stops(raw)
         else:
+            logger.error('Content-Type {}'.format(content_type))
             raise RuterException("unknown parse format for stopID")
     return d
 
@@ -130,31 +131,45 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
     # TODO: coordinates paramter
     url_template = 'http://reisapi.ruter.no/Place/GetClosestStops?coordinates=(x={easting},y={northing})&proposals={proposals}&maxdistance={distance}'
     proposals = 3
-    source_url = url_template.format(proposals=proposals, distance=distance, easting=easting, northing=northing)
+    source_url = url_template.format(proposals=int(proposals), distance=int(distance), easting=easting, northing=northing)
     logger.debug(source_url)
     request = urllib2.Request(source_url, headers={'Accepts': 'application/xml'})
     try:
         response = urllib2.urlopen(request)
-        content_type = response.headers.get('Content-Type')
+        content_type = get_content_type(response)
         response_body = response.read()
         status_code = response.getcode()
         return response_body, status_code, content_type
     except urllib2.HTTPError as e:
-        import pdb
-        pdb.set_trace()
         logger.error(str(e))
         return None, e.getcode()
     except urllib2.URLError as e:
-        import pdb
-        pdb.set_trace()
         logger.error(str(e))
         return None, e.code
+
+
+def get_closest_stop_by_distance(stop_ids, center_x, center_y):
+    shortest_stop_distance = float('inf')
+    shortest_stop = None
+
+    if len(stop_ids) > 1:
+        for stop in stop_ids:
+            d_x = center_x - stop.x
+            d_y = center_y - stop.y
+            stop_distance = math.hypot(d_x, d_y)
+            if stop_distance <= shortest_stop_distance:
+                shortest_stop_distance = stop_distance
+                shortest_stop = stop
+                logger.debug('Updating closest stop {}'.format(stop.__json__(None)))
+    elif len(stop_ids) == 1:
+        shortest_stop = stop_ids[0]
+    return shortest_stop
 
 
 def scan_closest_stopid_for_location(latitude, longitude):
     attempts = 0
     distance = 87.5
-    max_attempts = 4
+    max_attempts = 6
     stop_ids = []
     logger.debug("Converting WGS84 to UTM33 latitude={0} longitude={1}".format(latitude, longitude))
     latitude_n = 0
@@ -171,35 +186,37 @@ def scan_closest_stopid_for_location(latitude, longitude):
     (easting, northing, zone_number, zone_letter) = utm.from_latlon(latitude_n, longitude_n)
     easting_i = int(easting)
     northing_i = int(northing)
-    while len(stop_ids) != 1 and attempts < max_attempts:
-        logger.debug('scan_closest_stopid_for_location distance={0} attempt={1}'.format(distance, attempts))
+    while len(stop_ids) == 0 and attempts < max_attempts:
+        logger.debug('scan_closest_stopid_for_location distance={0} attempt={1}'.format(int(distance), attempts))
         response_body, status_code, content_type = fetch_stopid_for_location(easting_i, northing_i, distance=distance)
         if status_code == 200:
             stop_ids = parse_stopid_for_location(response_body, content_type)
         attempts += 1
         for i in range(attempts):
             distance *= 2
-    return stop_ids
+
+    shortest_stop = get_closest_stop_by_distance(stop_ids, easting, northing)
+    return shortest_stop
 
 
-# deprecated: unused
 def parse_transport_for_stop(raw, content_type):
     d = None
     if raw:
         first = raw[0]
-        if content_type in ['text/xml', 'application/xml']:
-            logger.debug('content type for stopid by location. using XML')
+        if content_type in ['text/xml', 'text/xml; charset=utf-8', 'application/xml', 'application/xml; charset=utf-8']:
+            logger.debug('content type for transport by stop. using XML')
             d = parse_xml_departures(raw)
-        elif content_type in ['application/json']:
-            logger.debug('content type for stopid by location. using JSON')
+        elif content_type in ['application/json', 'application/json; charset=utf-8']:
+            logger.debug('content type for transport by stop. using JSON')
             d = parse_json_departures(raw)
         elif first == '<':
-            logger.warning('unknown content type for stopid by location. Assuming XML')
+            logger.warning('unknown content type for transport by stop. Assuming XML')
             d = parse_xml_departures(raw)
         elif first in ['[', '{', '"']:
-            logger.warning('unknown content type for stopid by location. Assuming JSON')
+            logger.warning('unknown content type for transport by stop. Assuming JSON')
             d = parse_json_departures(raw)
         else:
+            logger.error('Content-Type {}'.format(content_type))
             raise RuterException("unknown parse format for stopID")
     return d
 
@@ -215,13 +232,11 @@ def fetch_transport_for_stop(stop, datetime):
     request = urllib2.Request(source_url, headers={'Accepts': 'application/json'})
     try:
         response = urllib2.urlopen(request)
-        content_type = response.headers.get('Content-Type')
+        content_type = get_content_type(response)
         response_body = response.read()
         status_code = response.getcode()
         return response_body, status_code, content_type
     except urllib2.HTTPError as e:
-        import pdb
-        pdb.set_trace()
         logger.error(str(e))
         return None, e.getcode()
     except urllib2.URLError as e:
@@ -229,7 +244,7 @@ def fetch_transport_for_stop(stop, datetime):
         return None, e.code
 
 
-def lookup_transport_for_stop(latitude, longitude):
+def lookup_transport_for_stop(latitude, longitude, limit=-1):
     """
     documenation for location lookup
 
@@ -241,11 +256,21 @@ def lookup_transport_for_stop(latitude, longitude):
     :return:
     """
     logger.debug('lookup_transport_for_stop latitude={0} longitude={1}'.format(latitude, longitude))
-    transports = []
-    stops = scan_closest_stopid_for_location(latitude, longitude)
-    if stops:
+    departure_response = DepartureResponse()
+    stop = scan_closest_stopid_for_location(latitude, longitude)
+    if stop:
         now_text = datetime.datetime.now().isoformat()
-        for s in stops:
-            transport_list = fetch_transport_for_stop(s, now_text)
-            transports.extend(transport_list)
-    return transports
+        response_body, status_code, content_type = fetch_transport_for_stop(stop, now_text)
+        if status_code == 200:
+            departures = parse_transport_for_stop(response_body, content_type)
+            departure_response.stop = stop
+            if limit >= 0:
+                size = min(len(departures), limit)
+                departures = departures[:size]
+            departure_response.departures = departures
+        else:
+            logger.error('fetch_transport_for_stop returned HTTP status {}'.format(status_code))
+    else:
+        departure_response.departures = []
+        logger.warn('No stop found nearby. unable to return results')
+    return departure_response

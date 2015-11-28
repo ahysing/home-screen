@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest
-from homescreen.public_transport_source import parse_transport_for_stop, parse_stopid_for_location
-from homescreen.public_transport import DepartureResponse
+from ..public_transport import Stop
+from ..public_transport_source import parse_stopid_for_location, parse_transport_for_stop, get_closest_stop_by_distance
+
 
 class PublicTansportSourceTests(unittest.TestCase):
     def setUp(self):
@@ -47,8 +48,19 @@ class PublicTansportSourceTests(unittest.TestCase):
         self.assertNotEqual(0, len(response))
 
 
-    def test_fetch_transport_for_stop(self):
-        pass
+    def test_get_closest_stop_by_distance(self):
+        s1 = Stop()
+        s1.x ='1'
+        s1.y ='2'
+        s2 = Stop()
+        s2.x ='100'
+        s2.y ='299'
+        stops = [s1, s2]
+        x = 1
+        y = 2
+        result = get_closest_stop_by_distance(stops, x, y)
+        self.assertEqual(result, s1)
+
 
 
 STOPID_FOR_LOCATION_RESPONSE = """[{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"Marker","ShortName":"","IsHub":false,"ID":1197385,"Name":"Yterbøl","District":"Marker","PlaceType":"Stop"},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170623,"Name":"Espa E6 Syd","District":"Stange","PlaceType":"Stop"},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170624,"Name":"Espa E6 Nord","District":"Stange","PlaceType":"Stop"}]"""

@@ -4,7 +4,7 @@
     longitude, onreadystatechange, open, readyState, replace, responseText,
     send, status
 */
-
+var TRANSPORT_LIMIT =  '10';
 var pt_object = {
     'element': undefined
 };
@@ -14,40 +14,76 @@ function begForLocation(callback) {
         navigator.geolocation.getCurrentPosition(callback);
     }
 }
-
+function iso8601_to_timehm(time_pp) {
+    'use strict';
+    var time_start = time_pp.indexOf('T');
+    var time_end = Math.max(time_pp.indexOf('Z'),time_pp.indexOf('+'));
+    return time_pp.slice(time_start+1, time_end);
+}
 function updateTransportDisplay(elem, text) {
     'use strict';
     if (elem !== undefined) {
-        var transports = JSON.parse(text);
-        if (transports) {
+        var obj = JSON.parse(text);
+        if (obj) {
             var container = document.createElement('div');
-            container.setAttribute('class', 'transport');
 
             while (elem.hasChildNodes()) {
                 elem.removeChild(elem.lastChild);
             }
 
-            var trips = transports['departures'];
-            trips.forEach(function(x) {
-                var route = document.createElement('article');
-                var icon = document.createElement('img');
-                var mode = x['vehicle_mode'];
-                var icon_link = '';
-                switch(mode) {
-                    case 'bus':
-                        icon_link = '/static/bus.png';
-                        break;
-                    default:
-                        break;
+            var transports = obj['transport'];
+            var d = undefined;
+            if (transports) {
+                d = transports['departures'];
+            }
 
-                }
-                icon.setAttribute('href', icon_link);
-                icon.setAttribute('alt', 'Mode of transport for departure');
-                route.setAttribute('class', 'transport');
-                route.innerText = x['line_name'] + '    ' + x['destination_aimed_arrival_time'];
-                container.appendChild(icon);
-                container.appendChild(route);
-            });
+            if (Array.isArray(d)) {
+                d.forEach(function(x) {
+                    var route = document.createElement('article');
+                    var icon = document.createElement('img');
+                    var display_txt = document.createElement('div');
+                    var time_txt = document.createElement('time');
+                    var h_line = document.createElement('div');
+
+                    var mode = x['vehicle_mode'];
+                    var icon_link = '';
+                    switch(mode) {
+                        case 0:
+                        case 'bus':
+                            icon_link = '/static/icon/bus.png';
+                            break;
+                        case 'rail':
+                            icon_link = '/static/icon/train.png';
+                            break;
+                        case 1:
+                        case 'ferry':
+                            icon_link = '/static/icon/ferry.png';
+                            break;
+                        default:
+                            icon_link = '/static/icon/unknown.png';
+                            break;
+                    }
+                    icon.setAttribute('href', icon_link);
+                    icon.setAttribute('alt', 'Mode of transport for departure');
+
+                    var destination_name = x['destination_name'];
+                    display_txt.innerText = x ['line_ref'] + ' ' + destination_name;
+
+                    var dt = x['destination_aimed_arrival_time'];
+                    var time_pp = iso8601_to_timehm(dt);
+                    time_txt.setAttribute('datetime', dt);
+                    time_txt.innerText = time_pp
+
+                    h_line.setAttribute('class', 'horizontal-line');
+                    route.appendChild(icon);
+                    route.appendChild(display_txt);
+                    route.appendChild(time_txt);
+                    route.appendChild(h_line);
+                    container.appendChild(route);
+                });
+            } else {
+                console.error('No transport inforamtion is available.');
+            }
 
             elem.appendChild(container);
         }
@@ -68,8 +104,9 @@ function requestTransportForLocation(e) {
         }
     }
 
-    var url_template = '/transport/next?latitude=%lat&longitude=%lon';
-    var url = url_template.replace('%lat', String(e.coords.latitude)).replace('%lon', String(e.coords.longitude));
+    var url_template = '/transport/next?latitude=%lat&longitude=%lon&limit=%lim';
+    var url = url_template.replace('%lat', String(e.coords.latitude)).replace('%lon', String(e.coords.longitude))
+    .replace('%lim', TRANSPORT_LIMIT);
     xhr.open('GET', url);
     xhr.setRequestHeader('Accepts', 'application/json');
     xhr.onreadystatechange = handleTransport;
