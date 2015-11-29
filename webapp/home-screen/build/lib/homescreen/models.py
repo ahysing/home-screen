@@ -12,6 +12,7 @@ from sqlalchemy.orm import (
     sessionmaker,
     )
 
+import sqlalchemy
 from zope.sqlalchemy import ZopeTransactionExtension
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))

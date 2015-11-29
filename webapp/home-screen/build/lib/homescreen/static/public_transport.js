@@ -48,12 +48,14 @@ function updateTransportDisplay(elem, text) {
                     var mode = x['vehicle_mode'];
                     var icon_link = '';
                     switch(mode) {
+                        case 0:
                         case 'bus':
                             icon_link = '/static/icon/bus.png';
                             break;
-                        case 'train':
+                        case 'rail':
                             icon_link = '/static/icon/train.png';
                             break;
+                        case 1:
                         case 'ferry':
                             icon_link = '/static/icon/ferry.png';
                             break;

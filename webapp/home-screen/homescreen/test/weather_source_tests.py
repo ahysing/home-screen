@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
-from homescreen.weather import Credit, Time, WeatherResponse
-from homescreen.weather_source import parse_forecast
+from ..weather import Credit, Time, WeatherResponse
+from ..weather_source import parse_forecast
 
 class WeatherSourceTests(unittest.TestCase):
     def setUp(self):

@@ -1,10 +1,5 @@
 from pyramid.response import Response
 from pyramid.view import view_config
-from sqlalchemy.exc import DBAPIError
-from .models import (
-    DBSession,
-    MyModel,
-)
 import input_validation
 import zip_place_source
 import weather_source
@@ -21,10 +16,7 @@ logger = logging.getLogger(__name__)
 
 @view_config(route_name='home', renderer='templates/mytemplate.pt')
 def my_view(request):
-    try:
-        one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
-    except DBAPIError:
-        return Response(conn_err_msg, content_type='text/plain', status_int=500)
+    one = 'one'
     return {'one': one, 'project': 'home-screen'}
 
 

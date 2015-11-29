@@ -1,11 +1,16 @@
-utm==0.4.0
-logging
-requests==2.8.1
-requests_ntlm
+# This requirements file lists all third-party dependencies for this project.
+#
+# Run 'pip install -r requirements.txt -t lib/' to install these dependencies
+# in `lib/` subdirectory.
+#
 ldap3==0.9.9.3
+logging
+paramiko==1.16.0
 pyramid==1.5.7
 pyramid_chameleon==0.3
 pyramid_debugtoolbar==2.4.2
 pyramid_tm==0.12.1
-transaction==1.4.4
+requests==2.8.1
+requests_ntlm
+utm==0.4.0
 waitress==0.8.10

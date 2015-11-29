@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest
 from pyramid import testing
-from homescreen.stop_handler import StopHandler
-from homescreen.public_transport import Stop
+from ..stop_handler import StopHandler
+from ..public_transport import Stop
 import xml.sax
 import cStringIO
 

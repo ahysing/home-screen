@@ -61,8 +61,6 @@ def parse_json_departures(raw):
     transports = json_decoder.decode(raw)
     for transport in transports:
         try:
-            import pdb
-            pdb.set_trace()
             d = Departure()
             monitored_vehicle_journey = transport['MonitoredVehicleJourney']
             d.vehicle_mode = monitored_vehicle_journey['VehicleMode']

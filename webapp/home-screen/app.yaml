@@ -6,25 +6,24 @@
 # TODO: Enter your application id below. If you have signed up
 # using cloud.google.com/console use the "project id" for your application
 # id.
-application: pyramid-gae
+application:  home-screen-1143
 version: 1
 runtime: python27
 api_version: 1
-threadsafe: yes
+threadsafe: no
 
 # Handlers define how to route requests to your application.
 handlers:
-
 # App Engine serves and caches static files contained in the listed directories
 # (and subdirectories). Uncomment and set the directory as needed.
-#- url: /client
-#  static_dir: client
+- url: /static
+  static_dir: homescreen/static
 
 # This handler tells app engine how to route requests to a WSGI application.
 # The script value is in the format <path.to.module>.<wsgi_application>
 # where <wsgi_application> is a WSGI application object.
 - url: .*  # This regex directs all routes to __init__.app
-  script: __init__.app
+  script: gae.py 
 
 # Third party libraries that are included in the App Engine SDK must be listed
 # here if you want to use them.  See
@@ -34,25 +33,5 @@ handlers:
 # project directory, either as a git submodule or as a plain subdirectory.
 # TODO: List any other App Engine SDK libs you may need here.
 libraries:
-  - name: utm
-    version: "0.4.0"
-  - name: logging
+  - name: lxml
     version: latest
-  - name: pyramid
-    version: "1.5.7"
-  - name: SQLAlchemy
-    version: "1.0.9"
-  - name: transaction
-    version: "1.4.4"
-  - name: zope.sqlalchemy
-    version: "0.7.6"
-  - name: waitress
-    version: "0.8.10"
-  - name: ldap3
-    version: "0.9.9.3"
-  - name: requests
-    version: "2.8.1"
-  - name: requests_ntlm
-    version: latest
-  - name: paramiko
-    version: "1.16.0"
