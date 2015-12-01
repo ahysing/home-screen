@@ -50,14 +50,17 @@ class PublicTansportSourceTests(unittest.TestCase):
 
     def test_get_closest_stop_by_distance(self):
         s1 = Stop()
-        s1.x ='1'
-        s1.y ='2'
+        s1.x =1
+        s1.y =2
+
         s2 = Stop()
-        s2.x ='100'
-        s2.y ='299'
+        s2.x =100
+        s2.y =299
+
         stops = [s1, s2]
         x = 1
         y = 2
+
         result = get_closest_stop_by_distance(stops, x, y)
         self.assertEqual(result, s1)
 
