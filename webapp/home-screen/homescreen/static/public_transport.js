@@ -4,6 +4,7 @@
     longitude, onreadystatechange, open, readyState, replace, responseText,
     send, status
 */
+var ALT_ICN = 'Transportmiddel for avreise';
 var TRANSPORT_LIMIT =  '10';
 var pt_object = {
     'element': undefined
@@ -17,8 +18,7 @@ function begForLocation(callback) {
 function iso8601_to_timehm(time_pp) {
     'use strict';
     var time_start = time_pp.indexOf('T');
-    var time_end = Math.max(time_pp.indexOf('Z'),time_pp.indexOf('+'));
-    return time_pp.slice(time_start+1, time_end);
+    return time_pp.slice(time_start+1, time_start+6);
 }
 function updateTransportDisplay(elem, text) {
     'use strict';
@@ -41,36 +41,39 @@ function updateTransportDisplay(elem, text) {
                 d.forEach(function(x) {
                     var route = document.createElement('article');
                     var icon = document.createElement('img');
-                    var display_txt = document.createElement('div');
+                    var display_txt = document.createElement('span');
                     var time_txt = document.createElement('time');
                     var h_line = document.createElement('div');
 
                     var mode = x['vehicle_mode'];
                     var icon_link = '';
+                    var port_pre = '//' + window.document.location.host;
                     switch(mode) {
                         case 0:
                         case 'bus':
-                            icon_link = '/static/icon/bus.png';
+                            icon_link = port_pre + '/static/icon/bus.png';
                             break;
                         case 'rail':
-                            icon_link = '/static/icon/train.png';
+                            icon_link = port_pre + '/static/icon/train.png';
                             break;
                         case 1:
                         case 'ferry':
-                            icon_link = '/static/icon/ferry.png';
+                            icon_link = port_pre + '/static/icon/ferry.png';
                             break;
                         default:
-                            icon_link = '/static/icon/unknown.png';
+                            icon_link = port_pre + '/static/icon/unknown.png';
                             break;
                     }
-                    icon.setAttribute('href', icon_link);
-                    icon.setAttribute('alt', 'Mode of transport for departure');
+
+                    icon.setAttribute('src', icon_link);
+                    icon.setAttribute('alt', ALT_ICN);
 
                     var destination_name = x['destination_name'];
                     display_txt.innerText = x ['line_ref'] + ' ' + destination_name;
-
+                    display_txt.setAttribute('class', 'transport-name');
                     var dt = x['destination_aimed_arrival_time'];
                     var time_pp = iso8601_to_timehm(dt);
+                    time_txt.setAttribute('class', 'transport-time');
                     time_txt.setAttribute('datetime', dt);
                     time_txt.innerText = time_pp
 

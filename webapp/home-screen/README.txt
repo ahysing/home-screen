@@ -8,7 +8,5 @@ Getting Started
 
 - $VENV/bin/python setup.py develop
 
-- $VENV/bin/initialize_home-screen_db development.ini
-
 - $VENV/bin/pserve development.ini
 

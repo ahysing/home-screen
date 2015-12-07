@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
-from homescreen.zip_place_source import parse_postnummer_closest_to
+from homescreen.zip_place_source import _parse_postnummer_closest_to
 from pyramid import testing
 
 
@@ -13,17 +13,17 @@ class ZipPlaceSourceTests(unittest.TestCase):
         pass
 
     def test_parsePostnummerClosestTo(self):
-        result = parse_postnummer_closest_to(GEONORGE_RESPONSE, self.latitude, self.longitude)
+        result = _parse_postnummer_closest_to(GEONORGE_RESPONSE, self.latitude, self.longitude)
         self.assertIsInstance(result, unicode)
         self.assertEqual(len(result), 4)
 
     def test_parsePostnummerClosestTo_resultTypeIsExpected(self):
-        result = parse_postnummer_closest_to(GEONORGE_RESPONSE, self.latitude, self.longitude)
+        result = _parse_postnummer_closest_to(GEONORGE_RESPONSE, self.latitude, self.longitude)
         self.assertIsInstance(result, unicode)
 
     def test_parsePostnummerClosestTo_resultIsNone(self):
         response_empty = '{"sokStatus":{"ok":"true","melding":""},"totaltAntallTreff":"6","adresser":[]}'
-        result = parse_postnummer_closest_to(response_empty, self.latitude, self.longitude)
+        result = _parse_postnummer_closest_to(response_empty, self.latitude, self.longitude)
         self.assertIsNone(result)
 
 GEONORGE_RESPONSE = """\

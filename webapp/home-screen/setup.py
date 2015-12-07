@@ -46,6 +46,5 @@ setup(name='home-screen',
       [paste.app_factory]
       main = homescreen:main
       [console_scripts]
-      initialize_home-screen_db = homescreen.scripts.initializedb:main
       """,
       )
