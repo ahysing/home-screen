@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 from ..weather import Credit, Time, WeatherResponse
-from ..weather_source import parse_forecast
+from ..weather_source import _parse_forecast
 
 class WeatherSourceTests(unittest.TestCase):
     def setUp(self):
@@ -11,23 +11,23 @@ class WeatherSourceTests(unittest.TestCase):
         pass
 
     def test_parse_forecast(self):
-        weather_forecast = parse_forecast(RESPONSE)
+        weather_forecast = _parse_forecast(RESPONSE)
         self.assertIsInstance(weather_forecast, WeatherResponse)
 
     def test_parse_forecast_containsTimeList(self):
-        weather_forecast = parse_forecast(RESPONSE)
+        weather_forecast = _parse_forecast(RESPONSE)
         tf = weather_forecast.time_forecasts
         self.assertIsNotNone(tf)
         self.assertIsInstance(tf, list)
 
     def test_parse_forecast_containsTimeListWithElements(self):
-        weather_forecast = parse_forecast(RESPONSE)
+        weather_forecast = _parse_forecast(RESPONSE)
         tf = weather_forecast.time_forecasts
         self.assertTrue(len(tf) > 0, 'The time forecast list is empty. No forecasts were returned')
         self.assertIsInstance(tf[0], Time)
 
     def test_parse_forecast_hasSourceCredits(self):
-        weather_forecast = parse_forecast(RESPONSE)
+        weather_forecast = _parse_forecast(RESPONSE)
         self.assertIsInstance(weather_forecast.credit, Credit)
 
 # source http://m.yr.no/sted/Norge/Postnummer/1364/varsel.xml 15.11.2015 12:28

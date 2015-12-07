@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 from ..public_transport import Stop
-from ..public_transport_source import parse_stopid_for_location, parse_transport_for_stop, get_closest_stop_by_distance
+from ..public_transport_source import _parse_stopid_for_location, _parse_transport_for_stop, _get_closest_stop_by_distance
 
 
 class PublicTansportSourceTests(unittest.TestCase):
@@ -18,32 +18,32 @@ class PublicTansportSourceTests(unittest.TestCase):
 
 
     def test_parse_stopid_for_location_xml(self):
-        departures = parse_stopid_for_location(XML_RESPONSE, self.xml)
+        departures = _parse_stopid_for_location(XML_RESPONSE, self.xml)
         self.assertIsNotNone(departures)
 
 
 #    def test_parse_stopid_for_location(self):
-#        departures = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
+#        departures = _parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
 #        self.assertIsNotNone(departures)
 
 
     def test_parse_transport_for_stop(self):
-        departures = parse_transport_for_stop(RESPONSE, self.json)
+        departures = _parse_transport_for_stop(RESPONSE, self.json)
         self.assertIsNotNone(departures)
 
 
     def test_parse_transport_for_stop_returnsResponse(self):
-        departures = parse_transport_for_stop(RESPONSE, self.json)
+        departures = _parse_transport_for_stop(RESPONSE, self.json)
         self.assertIsInstance(departures, list)
 
 
     def test_parse_stopid_for_location(self):
-        response = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
+        response = _parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
         self.assertIsInstance(response, list)
 
 
     def test_parse_stopid_for_location_response_has_stop_name(self):
-        response = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
+        response = _parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
         self.assertIsNotNone(response)
         self.assertNotEqual(0, len(response))
 
@@ -61,7 +61,7 @@ class PublicTansportSourceTests(unittest.TestCase):
         x = 1
         y = 2
 
-        result = get_closest_stop_by_distance(stops, x, y)
+        result = _get_closest_stop_by_distance(stops, x, y)
         self.assertEqual(result, s1)
 
 

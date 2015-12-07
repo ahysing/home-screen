@@ -4,19 +4,16 @@ import logging
 import pprint
 import ssl
 from lxml import etree
-
+import utils
+import asyncioutils
 import io
 
-import re
 from ntlm3 import ntlm
-
-from . import asyncioutils
-from . import utils
 
 logger = logging.getLogger(__name__)
 
 
-subscribe_to_tasks_message = """\
+subscribe_to_calendars = """\
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
   xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types">
@@ -184,245 +181,6 @@ class MSExchangeConnection:
         return tasks
 
     @asyncio.coroutine
-    def get_tasks(self):
-        results = []
-        # The searchresults might be paged, so we may have to send more than one request to the server to get
-        # all the results.
-        indexed_page_offset = 0
-        has_got_all_results = False
-        while not has_got_all_results:
-            msg = find_tasks_message % dict(
-                user_email_address=self.user_email_address,
-                indexed_page_offset=indexed_page_offset)
-            headers = dict(SOAPAction="http://schemas.microsoft.com/exchange/services/2006/messages/FindItem")
-            response, content = yield from self._send_request(method="POST",
-                                                              request_headers=headers,
-                                                              data=msg)
-
-            if response.status != 200:
-                raise MSExchangeConnectionError("get_tasks() failed! response.status:%s content:\n%s" % (
-                    response.status, content))
-
-            root = etree.parse(io.BytesIO(content))  # surely there has to be a simpler way of parsing a bytearray?
-
-            find_item_response_message = root.find(
-                ".//{http://schemas.microsoft.com/exchange/services/2006/messages}FindItemResponseMessage")
-            if find_item_response_message is None:
-                raise MSExchangeConnectionError(
-                    "Didn't find the 'FindItemResponseMessage' element in the response! response-content:\n%s" % (
-                        content,))
-
-            root_folder = find_item_response_message.find(
-                "{http://schemas.microsoft.com/exchange/services/2006/messages}RootFolder")
-
-            if find_item_response_message is None:
-                raise MSExchangeConnectionError(
-                    "Didn't find the 'RootFolder' element in the response! response-content:\n%s" % (
-                        content,))
-
-            response_class = find_item_response_message.get("ResponseClass")
-            if response_class != "Success":
-                raise MSExchangeConnectionError(
-                    "The FindItem request failed with ResponseClass '%s'! response-content:\n%s" % (
-                        response_class, content,))
-
-            response_code = root.findtext(".//{http://schemas.microsoft.com/exchange/services/2006/messages}ResponseCode")
-            if response_code != "NoError":
-                raise MSExchangeConnectionError("get_tasks() failed (response_code:'%s')! response.status:%s content:\n%s" % (
-                    response_code,
-                    response.status, content))
-
-            # Check if this is the last page of the searchresults
-            if root_folder.get("IncludesLastItemInRange") == "true":
-                # Yep, this was the last page
-                has_got_all_results = True
-            else:
-                # This was not the last page, so continue with the new offset
-                indexed_page_offset = int(root_folder.get("IndexedPagingOffset"))
-
-            items = root_folder.find("{http://schemas.microsoft.com/exchange/services/2006/types}Items")
-            if items is None:
-                raise MSExchangeConnectionError(
-                    "Didn't find the 'Items' element in the response! response-content:\n%s" % (
-                        content,))
-
-            for item in items:
-                # The item looks something like this:
-                #  <t:Task>
-                #    <t:ItemId Id="AQMkADAzNmNhNjJkLWViN2MtNGI2Mi04MzIzLTYwNDI3YmUzOWUxYQBGAAADnXryXV+8zkWj87Fi5hRdvwcA+U0/XFL4WEGRsdue41137QAAAgESAAAA+U0/XFL4WEGRsdue41137QAAAhEMAAAA" ChangeKey="EwAAABYAAAD5TT9cUvhYQZGx257jXXftAAAEGQCo"/>
-                #    <t:Subject>Order new brakes</t:Subject>
-                #    <t:HasAttachments>false</t:HasAttachments>
-                #    <t:PercentComplete>0</t:PercentComplete>
-                #    <t:Status>NotStarted</t:Status>
-                #  </t:Task>
-                # We want to flatten this into a dict like this:
-                # {"itemtype": "Task",
-                #  "ItemId": AQMkADAzNmNhNjJkLWViN2MtNGI2Mi04MzIzLTYwNDI3YmUzOWUxYQBGAAADnXryXV+8zkWj87Fi5hRdvwcA+U0/XFL4WEGRsdue41137QAAAgESAAAA+U0/XFL4WEGRsdue41137QAAAhEMAAAA" ChangeKey="EwAAABYAAAD5TT9cUvhYQZGx257jXXftAAAEGQCo",
-                #  "Subject": "Order new brakes",
-                #  "HasAttachments": "false",
-                #  "PercentComplete": "0",
-                #  "Status": "NotStarted"
-                #  }
-                iteminfo = dict(item.attrib)
-                iteminfo["itemtype"] = utils.remove_namespace(item.tag)
-                for child in item:
-                    valuename = utils.remove_namespace(child.tag)
-                    value = child.text
-                    if not value:
-                        if child.get("Id"):
-                            value = child.get("Id")
-                        else:
-                            value = dict(child.attrib)
-                    iteminfo[valuename] = value
-                results.append(iteminfo)
-
-        return results
-
-    def create_task_sync(self, subject, body):
-        task_id = asyncio.get_event_loop().run_until_complete(self.create_task(subject, body))
-        return task_id
-
-    @asyncio.coroutine
-    def create_task(self, subject, body):
-        msg = create_task_message % dict(user_email_address=self.user_email_address,
-                                         subject=subject,
-                                         body=body)
-        headers = dict(SOAPAction="http://schemas.microsoft.com/exchange/services/2006/messages/CreateItem")
-        response, content = yield from self._send_request(method="POST",
-                                                          request_headers=headers,
-                                                          data=msg)
-
-        if response.status != 200:
-            raise MSExchangeConnectionError("create_task() failed! response.status:%s content:\n%s" % (
-                response.status, content))
-
-        root = etree.parse(io.BytesIO(content))  # surely there has to be a simpler way of parsing a bytearray?
-
-        create_item_response_message = root.find(
-            ".//{http://schemas.microsoft.com/exchange/services/2006/messages}CreateItemResponseMessage")
-        if create_item_response_message is None:
-            raise MSExchangeConnectionError(
-                "Didn't find the 'CreateItemResponseMessage' element in the response! response-content:\n%s" % (
-                    content,))
-
-        response_class = create_item_response_message.get("ResponseClass")
-        if response_class != "Success":
-            raise MSExchangeConnectionError(
-                "The CreateItem request failed with ResponseClass '%s'! response-content:\n%s" % (
-                    response_class, content,))
-
-        response_code = create_item_response_message.findtext(
-            ".//{http://schemas.microsoft.com/exchange/services/2006/messages}ResponseCode")
-        if response_code != "NoError":
-            raise MSExchangeConnectionError(
-                "create_item() failed (response_code:'%s')! response.status:%s content:\n%s" % (
-                    response_code,
-                    response.status, content))
-
-        item_id = create_item_response_message.find(".//{http://schemas.microsoft.com/exchange/services/2006/types}ItemId").get("Id")
-        return item_id
-
-    def delete_item_sync(self, item_id):
-        asyncio.get_event_loop().run_until_complete(self.delete_item(item_id))
-
-    @asyncio.coroutine
-    def delete_item(self, item_id):
-        msg = delete_item_message % dict(user_email_address=self.user_email_address,
-                                         item_id=item_id)
-        headers = dict(SOAPAction="http://schemas.microsoft.com/exchange/services/2006/messages/DeleteItem")
-        response, content = yield from self._send_request(method="POST",
-                                                          request_headers=headers,
-                                                          data=msg)
-
-        if response.status != 200:
-            raise MSExchangeConnectionError("delete_item() failed! response.status:%s content:\n%s" % (
-                response.status, content))
-
-        root = etree.parse(io.BytesIO(content))  # surely there has to be a simpler way of parsing a bytearray?
-
-        delete_item_response_message = root.find(
-            ".//{http://schemas.microsoft.com/exchange/services/2006/messages}DeleteItemResponseMessage")
-        if delete_item_response_message is None:
-            raise MSExchangeConnectionError(
-                "Didn't find the 'DeleteItemResponseMessage' element in the response! response-content:\n%s" % (
-                    content,))
-
-        response_class = delete_item_response_message.get("ResponseClass")
-        if response_class != "Success":
-            raise MSExchangeConnectionError(
-                "The DeleteItem request failed with ResponseClass '%s'! response-content:\n%s" % (
-                    response_class, content,))
-
-        response_code = delete_item_response_message.findtext(
-            ".//{http://schemas.microsoft.com/exchange/services/2006/messages}ResponseCode")
-        if response_code != "NoError":
-            raise MSExchangeConnectionError(
-                "delete_item() failed (response_code:'%s')! response.status:%s content:\n%s" % (
-                    response_code,
-                    response.status, content))
-
-    @asyncio.coroutine
-    def smoke_test_get_request(self):
-        try:
-            for requestindex in range(10):
-                response, content = yield from self._send_request(method="GET")
-                if not response.status == 200:
-                    raise AssertionError("smoketest#%d failed! response.status:%s" % (requestindex, response.status,))
-                #logger.info("request#%d succeeded" % (requestindex,))
-
-        finally:
-            if self._writer is not None:
-                self._writer.close()
-        return response, content
-
-    def close(self):
-        self._is_closed = True
-        if self._writer is not None:
-            self._writer.close()
-
-    @asyncio.coroutine
-    def poll_for_events(self, result_queue):
-        while not self._is_closed:
-            try:
-                subscription_id = yield from self.send_subscribe_request()
-                if not subscription_id:
-                    logger.warning("Failed to get a subscription for the user '%s'. I'll retry later." % (self.user_email_address,))
-                else:
-                    logger.debug("poll_for_events(): calling send_sync_request()")
-                    yield from self.send_sync_request(subscription_id, result_queue) # this hangs until the connection is lost of the subscription expires
-            except:
-                logger.exception("Something went wrong, but I'll retry in a while")
-
-    @asyncio.coroutine
-    def send_subscribe_request(self):
-        msg = subscribe_to_tasks_message % dict(user_email_address=self.user_email_address)
-        headers = dict(SOAPAction="http://schemas.microsoft.com/exchange/services/2006/messages/Subscribe")
-        response, content = yield from self._send_request(method="POST",
-                                                          request_headers=headers,
-                                                          data=msg)
-
-        if response.status != 200:
-            logger.warning("send_subscribe_request() failed! response.status:%s content:\n%s" % (
-                response.status, content))
-            return None
-
-        root = etree.parse(io.BytesIO(content))  # surely there has to be a simpler way of parsing a bytearray?
-        response_code = root.findtext(".//{http://schemas.microsoft.com/exchange/services/2006/messages}ResponseCode")
-        if response_code != "NoError":
-            logger.warning("send_subscribe_request() failed (response_code:'%s')! response.status:%s content:\n%s" % (
-                response_code,
-                response.status, content))
-            return None
-
-        subscription_id = root.findtext(".//{http://schemas.microsoft.com/exchange/services/2006/messages}SubscriptionId")
-        if not subscription_id:
-            logger.warning("send_subscribe_request() didn't contain a SubscriptionId! response.status:%s content:\n%s" % (
-                response_code,
-                response.status, content))
-            return None
-        return subscription_id
-
-    @asyncio.coroutine
     def send_sync_request(self, subscription_id, event_queue):
         msg = get_streaming_events_msg % dict(subscription_id=subscription_id,
                                               user_email_address=self.user_email_address)
@@ -518,7 +276,7 @@ class MSExchangeConnection:
         chunked_data_parser = etree.XMLParser(target=parser_target)
         chunked_data_parser.feed(b"<dummyrootelement>")
 
-        response, content = yield from self._send_request(method="POST", request_headers=headers, data=msg,
+        response, content = self._send_request(method="POST", request_headers=headers, data=msg,
                                                           chunked_data_handler=chunked_data_parser.feed)
 
         if response.status != 200:
@@ -557,7 +315,7 @@ class MSExchangeConnection:
         if self._reader is None:
             # We don't have a tcp connection, so create one now
             logger.debug("_send_request() calling asyncio.open_connection()")
-            reader, writer = yield from asyncio.open_connection(
+            reader, writer = asyncio.open_connection(
                 self._msexchange_server.exchange_server_ip, self._msexchange_server.exchange_server_port,
                 ssl=self._ssl_context)
             logger.debug("_send_request() finished calling asyncio.open_connection()")
@@ -572,7 +330,7 @@ class MSExchangeConnection:
                 request_headers["Cookie"] = self._cookies
 
         logger.debug("_send_request() calling asyncioutils.async_http_request()")
-        response, content = yield from asyncioutils.async_http_request(reader, writer, url,
+        response, content = asyncioutils.async_http_request(reader, writer, url,
                                                                        request_headers, method=method,
                                                                        data=data,
                                                                        chunked_data_handler=chunked_data_handler)
@@ -628,7 +386,7 @@ class MSExchangeConnection:
         # anyway.
         #args_nostream = dict(args, stream=False)
         #response2 = response.connection.send(request, **args_nostream)
-        response2, content2 = yield from asyncioutils.async_http_request(reader, writer, url, request2_headers,
+        response2, content2 = asyncioutils.async_http_request(reader, writer, url, request2_headers,
                                                                          method=method,
                                                                          data=data,
                                                                          chunked_data_handler=chunked_data_handler)
@@ -667,11 +425,8 @@ class MSExchangeConnection:
         ).decode('ascii')
         request3_headers[auth_header] = auth
 
-        response3, content3 = yield from asyncioutils.async_http_request(reader, writer, url, request3_headers,
+        response3, content3 = asyncioutils.async_http_request(reader, writer, url, request3_headers,
                                                                          method=method,
                                                                          data=data,
                                                                          chunked_data_handler=chunked_data_handler)
-
         return response3, content3
-
-

@@ -12,7 +12,7 @@ class GeonorgeException(Exception):
     pass
 
 
-def parse_postnummer(raw):
+def _parse_postnummer(raw):
     zip_dict = {}
     reader = csv.reader(raw)
     for row in reader:
@@ -39,7 +39,7 @@ def fetch_postnummer():
         response_body = response.read()
         status_code = response.getcode()
         if status_code == 200:
-            return parse_postnummer(response_body)
+            return _parse_postnummer(response_body)
         else:
             logger.error("Returned")
             return None
@@ -49,7 +49,7 @@ def fetch_postnummer():
         return None, e.code
 
 
-def parse_postnummer_closest_to(raw, latitude, longitude):
+def _parse_postnummer_closest_to(raw, latitude, longitude):
     json_decoder = json.JSONDecoder()
     try:
         result = json_decoder.decode(raw)
@@ -107,7 +107,7 @@ def lookup_postnummer_closest_to(latitude, longitude, radius=0.1, num_results=2,
     response_body, status_code = fetch_postnummer_closest_to(latitude, longitude, radius=radius,
                                                              num_results=num_results, page=page)
     if status_code == 200:
-        return parse_postnummer_closest_to(response_body, latitude, longitude)
+        return _parse_postnummer_closest_to(response_body, latitude, longitude)
     else:
         logger.error("Returned " + str(status_code))
         return None

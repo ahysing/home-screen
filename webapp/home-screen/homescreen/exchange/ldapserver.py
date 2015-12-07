@@ -4,17 +4,14 @@ import ssl
 import ldap3
 import ldap3.utils.dn
 
-from . import utils
-
 logger = logging.getLogger(__name__)
 
-class LDAPServer:
-    """This is a utilityclass for wrapping the raw LDAP operations into a nice api"""
 
+class LDAPServer:
     def __init__(self,
-                 ldap_server_url="ldaps://sesam-ci-dc.cloudapp.net",
-                 ldap_user="sesam-ci\\sesam",
-                 ldap_password="BouvetSesam1234",
+                 ldap_server_url,
+                 ldap_user,
+                 ldap_password,
                  default_organizational_unit=None):
 
         self._ldap_server_url = ldap_server_url

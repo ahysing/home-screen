@@ -1,4 +1,7 @@
 class DepartureResponse(object):
+    """
+    A station or stop with a list of departures from that stop.
+    """
     def __init__(self):
         self.departures = []
         self.stop = None
@@ -9,6 +12,9 @@ class DepartureResponse(object):
 
 
 class Stop(object):
+    """
+    A bus, rail, ferry or plane stop.
+    """
     def __init__(self):
         self.x = None
         self.y = None
@@ -23,6 +29,9 @@ class Stop(object):
 
 
 class Departure(object):
+    """
+    Departure from station.
+    """
     def __init__(self):
         self.line_ref = None
         self.direction = None

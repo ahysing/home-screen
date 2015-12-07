@@ -23,7 +23,7 @@ class PublicTansportSourceTests(unittest.TestCase):
 
 
 #    def test_parse_stopid_for_location(self):
-#        departures = parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
+#        departures = _parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
 #        self.assertIsNotNone(departures)
 
 

@@ -4,7 +4,6 @@ import requests.exceptions
 import logging
 from . import config
 
-
 logger = logging.getLogger(__name__)
 
 

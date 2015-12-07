@@ -6,6 +6,10 @@ logger = logging.getLogger(__name__)
 
 
 class StopHandler(xml.sax.ContentHandler):
+    """
+    A SAX parser for which converts bus, plane, ferry and rail stops from valid XML documents into a list of Stop
+    objects.
+    """
     def __init__(self):
         self.set_all_none()
         self.clear_flags()

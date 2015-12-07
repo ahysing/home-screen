@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import unittest
-from homescreen.zip_place_source import parse_postnummer, parse_postnummer_closest_to
+from homescreen.zip_place_source import parse_postnummer_closest_to
 from pyramid import testing
 
 
-class ZipPlaceManagerTests(unittest.TestCase):
+class ZipPlaceSourceTests(unittest.TestCase):
     def setUp(self):
         self.latitude = 59.90
         self.longitude = 11.23

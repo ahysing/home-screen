@@ -18,7 +18,7 @@ class RuterException(Exception):
     pass
 
 
-def parse_xml_stops(raw):
+def _parse_xml_stops(raw):
     xml_reader = xml.sax.make_parser()
     stream = cStringIO.StringIO(raw)
     stop_handler = StopHandler()
@@ -32,7 +32,7 @@ def parse_xml_stops(raw):
         raise RuterException(e)
 
 
-def parse_json_stops(raw):
+def _parse_json_stops(raw):
     json_decoder = json.JSONDecoder()
     stops = []
     try:
@@ -55,7 +55,7 @@ def parse_json_stops(raw):
     return stops
 
 
-def parse_json_departures(raw):
+def _parse_json_departures(raw):
     departures = []
     json_decoder = json.JSONDecoder()
     transports = json_decoder.decode(raw)
@@ -86,7 +86,7 @@ def parse_json_departures(raw):
     return departures
 
 
-def parse_xml_departures(raw):
+def _parse_xml_departures(raw):
     sax_xmlreader = xml.sax.make_parser()
     departure_handler = DepartureHandler()
     stream = cStringIO.StringIO(raw)
@@ -99,22 +99,22 @@ def parse_xml_departures(raw):
         logger.error(str(e))
         raise RuterException(e)
 
-def parse_stopid_for_location(raw, content_type):
+def _parse_stopid_for_location(raw, content_type):
     d = None
     if raw:
         first = raw[0]
         if content_type in ['text/xml', 'text/xml; charset=utf-8', 'application/xml', 'application/xml; charset=utf-8']:
             logger.debug('content type for stopid by location. using XML')
-            d = parse_xml_stops(raw)
+            d = _parse_xml_stops(raw)
         elif content_type in ['application/json', 'application/json; charset=utf-8']:
             logger.debug('content type for stopid by location. using JSON')
-            d = parse_json_stops(raw)
+            d = _parse_json_stops(raw)
         elif first == '<':
             logger.warning('unknown content type for stopid by location. Assuming XML')
-            d = parse_xml_stops(raw)
+            d = _parse_xml_stops(raw)
         elif first in ['[', '{', '"']:
             logger.warning('unknown content type for stopid by location. Assuming JSON')
-            d = parse_json_stops(raw)
+            d = _parse_json_stops(raw)
         else:
             logger.error('Content-Type {}'.format(content_type))
             raise RuterException("unknown parse format for stopID")
@@ -148,7 +148,7 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
         return None, e.code
 
 
-def get_closest_stop_by_distance(stop_ids, center_x, center_y):
+def _get_closest_stop_by_distance(stop_ids, center_x, center_y):
     shortest_stop_distance = float('inf')
     shortest_stop = None
 
@@ -190,31 +190,31 @@ def scan_closest_stopid_for_location(latitude, longitude):
         logger.debug('scan_closest_stopid_for_location distance={0} attempt={1}'.format(int(distance), attempts))
         response_body, status_code, content_type = fetch_stopid_for_location(easting_i, northing_i, distance=distance)
         if status_code == 200:
-            stop_ids = parse_stopid_for_location(response_body, content_type)
+            stop_ids = _parse_stopid_for_location(response_body, content_type)
         attempts += 1
         for i in range(attempts):
             distance *= 2
 
-    shortest_stop = get_closest_stop_by_distance(stop_ids, easting, northing)
+    shortest_stop = _get_closest_stop_by_distance(stop_ids, easting, northing)
     return shortest_stop
 
 
-def parse_transport_for_stop(raw, content_type):
+def _parse_transport_for_stop(raw, content_type):
     d = None
     if raw:
         first = raw[0]
         if content_type in ['text/xml', 'text/xml; charset=utf-8', 'application/xml', 'application/xml; charset=utf-8']:
             logger.debug('content type for transport by stop. using XML')
-            d = parse_xml_departures(raw)
+            d = _parse_xml_departures(raw)
         elif content_type in ['application/json', 'application/json; charset=utf-8']:
             logger.debug('content type for transport by stop. using JSON')
-            d = parse_json_departures(raw)
+            d = _parse_json_departures(raw)
         elif first == '<':
             logger.warning('unknown content type for transport by stop. Assuming XML')
-            d = parse_xml_departures(raw)
+            d = _parse_xml_departures(raw)
         elif first in ['[', '{', '"']:
             logger.warning('unknown content type for transport by stop. Assuming JSON')
-            d = parse_json_departures(raw)
+            d = _parse_json_departures(raw)
         else:
             logger.error('Content-Type {}'.format(content_type))
             raise RuterException("unknown parse format for stopID")
@@ -262,7 +262,7 @@ def lookup_transport_for_stop(latitude, longitude, limit=-1):
         now_text = datetime.datetime.now().isoformat()
         response_body, status_code, content_type = fetch_transport_for_stop(stop, now_text)
         if status_code == 200:
-            departures = parse_transport_for_stop(response_body, content_type)
+            departures = _parse_transport_for_stop(response_body, content_type)
             departure_response.stop = stop
             if limit >= 0:
                 size = min(len(departures), limit)

@@ -277,7 +277,7 @@ class WeatherHandler(xml.sax.handler.ContentHandler):
             self.time_forecasts.append(self.time)
 
 
-def parse_forecast(raw):
+def _parse_forecast(raw):
     sax_xmlreader = xml.sax.make_parser()
     stream = cStringIO.StringIO(raw)
     try:
@@ -298,7 +298,7 @@ def parse_forecast(raw):
 def lookup_forecast_for_postnummer(postnummer):
     response_body, status_code = fetch_forecast_for_postnummer(postnummer)
     if status_code == 200:
-        return parse_forecast(response_body)
+        return _parse_forecast(response_body)
     else:
         return WeatherResponse()
 
