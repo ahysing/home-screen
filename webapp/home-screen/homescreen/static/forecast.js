@@ -4,7 +4,7 @@
     longitude, onreadystatechange, open, readyState, replace, responseText,
     send, status
 */
-
+var TO_TXT = 'til'
 var forecast_object = {
     'element': undefined,
     'credits': undefined
@@ -36,14 +36,25 @@ function updateForecastDisplay(elem, credit_elem, responseText) {
         forecasts.slice(0,5).forEach(function(x, i) {
             var container = document.createElement('article');
             var time_elem = document.createElement('div');
+            var time_from = document.createElement('time');
+            var time_separator = document.createElement('span');
+            var time_to = document.createElement('time');
             var element = document.createElement('i');
             var temperature_elem = document.createElement('div');
             var temperature = x['temperature'];
             var tool_tip = x['symbol_name'];
-            var time = x['start'].substr(11,5) + " til " + x['to'].substr(11,5);
+
+            var start_s = x['start'];
+            time_from.setAttribute('datetime', start_s);
+            time_from.innerText = start_s.substr(11,5);
+            time_separator.innerText = " "+ TO_TXT +" ";
+            var time_e = x['to'];
+            time_to.setAttribute('datetime', time_e);
+            time_to.innerText = time_e.substr(11,5);
+
             var symbol = parseInt(x['symbol_number_ex']);
-            // http://om.yr.no/forklaring/symbol/
             var s = 'wi';
+            // http://om.yr.no/forklaring/symbol/
             switch (symbol) {
                 case 1:
                     s = 'wi wi-day-sunny';
@@ -189,7 +200,9 @@ function updateForecastDisplay(elem, credit_elem, responseText) {
             element.setAttribute('title', tool_tip);
             container.appendChild(element);
 
-            time_elem.innerText = time;
+            time_elem.appendChild(time_from);
+            time_elem.appendChild(time_separator);
+            time_elem.appendChild(time_to);
             time_elem.setAttribute('class', 'weather-time');
             container.appendChild(time_elem);
 

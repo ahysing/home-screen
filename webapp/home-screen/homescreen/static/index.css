@@ -25,37 +25,42 @@ h6 {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 100%;
   font-weight: bold;
+  padding: 15px;
 }
 
 .forecast {
-  font-size: 1000%;
-  font-weight: bold;
 }
-.transport > article {
-  padding: 15;
+.transport * article {
+  padding: 15px;
+  font-size: 200%;
 }
-.temperature
-{
-  font-size: 0.3em;
+.temperature {
   font-weight: bold;
   left: 50%;
   display:inline;
 }
-.transport-time
-{
+.transport-time {
   padding 0.5em;
   font-weight: bold;
   left: 50%;
   display:inline;
 }
+i.wi, .transport * img {
+  padding: 15px;
+}
 .weather-time {
-  font-size: 25%;
-  font-weight: bold;
   left: 50%;
   display:inline;
 }
+.weather-time time {
+  font-weight: bold;
+}
 .weather-container {
-  padding: 0.1em;
+  padding: 15px;
+  font-size: 200%;
+}
+i[title]:hover:after {
+  font-size: 200%;
 }
 input.authenticate{
     margin: 0.1em;
@@ -67,13 +72,13 @@ input.authenticate{
 .horizontal-line {
    width: 100%;
    height: 3px;
-   background-color: #F4F4F4;
+   background-color: #121212;
    margin: 0 auto;
 }
 .vertical-line {
    width: 1px;
    height: 300px;
-   background-color: #F4F4F4;
+   background-color: #121212;
    margin: 0 auto;
 }
 .inactive-form {

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Personlig oversikt over kalender, vær og offentlig transport der du er nå">
     <link rel="shortcut icon" href="${request.static_url('homescreen:static/today-xxl.png')}">
+    <link href="${request.static_url('homescreen:static/index.css')}" rel="stylesheet">
     <title>Vær for Oslo</title>
   </head>
   <body>
@@ -13,46 +14,10 @@
       <h1>Været for Oslo</h1>
     </header>
     <article class="wather-container" tabindex="-1">
+      <span class="temperature">{temperature}°</span>
       <i class="{icon}"></i>
-      <div class="temperature">{temperature}°</div>
-      <div class="time">{from} til {to}</div>
+      <span class="time"><time datetime="{from}">{from}</time><span>til </span> <time datetime="{to}">{to}</time></span>
     </article>
-    <style>
-@import url(//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700);
-body {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 300;
-  color: #ffffff;
-  background: #bc2131;
-}
-article {
-  width: 180px;
-  height: 64px;
-}
-h1 {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 300;
-}
-.forecast {
-  font-size: 1000%;
-  font-weight: bold;
-}
-
-.temperature {
-  font-size: 40%;
-  font-weight: bold;
-  left: 50%;
-}
-.weather-time {
-  font-size: 25%;
-  font-weight: bold;
-  left: 50%;
-}
-
-.weather-container {
-  padding: 0.1em;
-}
-    </style>
     <link href="${request.static_url('homescreen:static/w/css/weather-icons.min.css')}" type="text/css" rel="stylesheet">
     <link href="${request.static_url('homescreen:static/w/css/weather-icons-wind.min.css')}" type="text/css" rel="stylesheet">
   </body>
