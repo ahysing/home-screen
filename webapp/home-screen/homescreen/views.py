@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pyramid.response import Response
 from pyramid.view import view_config
 import input_validation
@@ -37,6 +38,10 @@ def transport_next_static(request):
     transport = None
     updated = '2015-01-01T00:00:00Z'
     updated_txt = 'Sist oppdatert'
+
+    if 'latitude' in request.GET and 'longitude' in request.GET:
+        latitude = request.GET['latitude']
+        longitude = request.GET['longitude']
 
     try:
         logger.debug('transport_next latitude={0} longitude={1}'.format(latitude, longitude))
@@ -90,6 +95,7 @@ The response is the next public transport departures. Optionally pass limit for 
 def forecast_static(request):
     dt_separator = 'til'
     error = None
+    forecast = None
     from_dt = '2015-01-01T00:00:00Z'
     from_time = '00:00'
     icon = 'wi'
@@ -98,13 +104,19 @@ def forecast_static(request):
     to_dt = '2015-01-01T00:00:00Z'
     to_time = '00:00'
     weather_h1 = 'Været for Oslo'
+    if 'postnummer' in request.GET:
+            postnummer = request.GET['postnummer']
+            if not input_validation.is_valid_postnummer(postnummer):
+                request.response.status = 400
+                return {'error': 'postnummer not accepted', 'params': ['postnummer']}
+
     try:
         forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
     except YrException as e:
-	    error = str(e)
+	error = str(e)
         logger.error(str(e))
-    return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'from':from_dt, 'to':to_dt,
-            'from_time': from_time, 'to_time': to_time, 'weather_h1': weather_h1, 'error': error}
+    return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'forecast':forecast, 'from':from_dt,
+            'to':to_dt, 'from_time': from_time, 'to_time': to_time, 'weather_h1': weather_h1, 'error': error}
 
 @view_config(route_name='forecast', renderer='json')
 def forecast(request):
@@ -138,7 +150,7 @@ The response is the current weather forecast', 'params': ['postnummer', 'latitud
         request.response.status = 500
         return {'error': message, 'params': ['postnummer', 'latitude', 'longitude']}
 
-def get_next_week_date():
+def _get_next_week_date():
     end = datetime.datetime.now() + datetime.timedelta(days=7)
     return end
 
@@ -146,10 +158,10 @@ def get_next_week_date():
 def mail_calendar(request):
     message = None
     root_url = 'https://mail.bouvet.no/autodiscover/autodiscover.xml'
-    end = get_next_week_date()
+    end = _get_next_week_date()
     try:
         mail_source = MailSource(root_url)
-        calendar = mail_source.lookupCalendarTo(end)
+        calendar = mail_source.lookup_calendar_to(end)
         return {'error': message, 'params': [], 'result': calendar}
     except MsExchangeException as e:
         message = str(e)
@@ -169,13 +181,13 @@ def index(request):
 #TODO: this view is not programmed yet
 @view_config(route_name='index:static', renderer='templates/index.pt')
 def index_static(request):
-    end = get_next_week_date()
+    end = _get_next_week_date()
     root_url = 'https://mail.bouvet.no/autodiscover/autodiscover.xml'
     username = ''
     password = ''
     try:
         mail_source = MailSource(root_url, service_account_username=username, service_account_password=password)
-        calendar = mail_source.lookupCalendarTo(end)
+        calendar = mail_source.lookup_calendar_to(end)
         return { 'mail_url' : root_url, 'calendar': calendar, 'show_authenticate': 'active-form' }
     except MsExchangeException as e:
         message = str(e)
@@ -188,10 +200,10 @@ def index_authenticate(request):
     username = request.params['username']
     password = request.params['password']
     root_url = 'https://mail.bouvet.no/autodiscover/autodiscover.xml'
-    end = get_next_week_date()
+    end = _get_next_week_date()
     try:
         mail_source = MailSource(root_url, service_account_username=username, service_account_password=password)
-        calendar = mail_source.lookupCalendarTo(end)
+        calendar = mail_source.lookup_calendar_to(end)
         return {'error': message, 'params': ['username', 'password'], 'calendar': calendar, 'show_authenticate': 'inactive-form'}
     except MsExchangeException as e:
         message = str(e)
