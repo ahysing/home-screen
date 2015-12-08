@@ -145,8 +145,7 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
         return None, e.getcode()
     except urllib2.URLError as e:
         logger.error(str(e))
-        return None, e.code
-
+        raise RuterException(e)
 
 def _get_closest_stop_by_distance(stop_ids, center_x, center_y):
     shortest_stop_distance = float('inf')
@@ -241,7 +240,7 @@ def fetch_transport_for_stop(stop, datetime):
         return None, e.getcode()
     except urllib2.URLError as e:
         logger.error(str(e))
-        return None, e.code
+        raise RuterException(e)
 
 
 def lookup_transport_for_stop(latitude, longitude, limit=-1):

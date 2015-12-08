@@ -7,18 +7,20 @@
     <meta name="description" content="Personlig oversikt over kalender, vær og offentlig transport der du er nå">
     <link rel="shortcut icon" href="${request.static_url('homescreen:static/today-xxl.png')}">
     <title>Busser fra Oslo S</title>
-    <!-- Bootstrap core CSS -->
-    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="${request.static_url('homescreen:static/index.css')}" rel="stylesheet">
   </head>
   <body>
     <div class="container">
       <section xmlns:tal="http://xml.zope.org/namespaces/tal">
-          <h1>Busser fra Oslo S</h1>
-          <article tal:repeat="it transport" tabindex="-1">
-            <p>Sist oppdatert <time tal:attributes="datetime it.time_at" tal:content="it.time_at"></time>
-            <span tal:content="it.line_number it.line_name &nbsp;&nbsp;&nbsp;&nbsp; it.line_time"></span>
-            </p>
+        <hgroup>
+          <h1>Busser fra {stop_name}</h1>
+          <p>{updated_txt}{updated}></p>
+        </hgroup>
+          <article tal:repeat="it transport">
+            <img src="${request.static_url('homescreen:static/bus.css')}" alt="{alt_departure_type}">
+            <span class="transport-name" tal:content="it.line_number it.line_name"></span>
+            <time class="transport-time" datetime="{from}">{from_time}</time>
+            <div class="horizontal-line"></div>
           </article>
       </section>
     </div>

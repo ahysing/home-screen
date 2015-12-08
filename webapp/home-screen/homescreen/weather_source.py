@@ -320,4 +320,4 @@ def fetch_forecast_for_postnummer(postnummer):
     except urllib2.URLError as e:
         message = str(e)
         logger.error(message)
-        return None, e.code
+        raise YrException(e)

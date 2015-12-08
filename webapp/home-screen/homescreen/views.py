@@ -26,19 +26,27 @@ def build_error_latlong(latitude, longitude):
 
 @view_config(route_name='transport:next:static', renderer='templates/transport_next_static.pt')
 def transport_next_static(request):
-    transport = None
+    alt_departure_type = 'Transportmiddel for avreise'
     error = None
-    # Longitude and latitude for the center of Oslo
-    latitude = u'59.5440'
-    longitude = u'10.4510'
+    from_dt = '2015-01-01T00:00:00Z'
+    from_time = '00:00'
+    latitude = u'59.5440'         # Longitude and latitude for the center of Oslo
     limit = 10
+    longitude = u'10.4510'        # Longitude and latitude for the center of Oslo
+    stop_name = 'Oslo S'
+    transport = None
+    updated = '2015-01-01T00:00:00Z'
+    updated_txt = 'Sist oppdatert'
+
     try:
         logger.debug('transport_next latitude={0} longitude={1}'.format(latitude, longitude))
         transport = public_transport_source.lookup_transport_for_stop(latitude, longitude, limit=limit)
     except RuterException as e:
         error = str(e)
         logger.error(str(e))
-    return {'transport': transport, 'error':error}
+    return {'from':from_dt, 'from_time':from_time, 'alt_departure_type': alt_departure_type,
+            'updated_txt': updated_txt, 'updated':updated, 'stop_name':stop_name,
+            'transport': transport, 'error':error}
 
 
 @view_config(route_name='transport:next', renderer='json')
@@ -80,18 +88,23 @@ The response is the next public transport departures. Optionally pass limit for 
 
 @view_config(route_name='forecast:static', renderer='templates/forecast_static.pt')
 def forecast_static(request):
-    icon = 'wi'
-    temperature = '0'
-    time_from = '00:00'
-    time_to = '00:00'
+    dt_separator = 'til'
     error = None
+    from_dt = '2015-01-01T00:00:00Z'
+    from_time = '00:00'
+    icon = 'wi'
     postnummer = '0250' # Aker Brygge per november 2015
+    temperature = '0'
+    to_dt = '2015-01-01T00:00:00Z'
+    to_time = '00:00'
+    weather_h1 = 'Været for Oslo'
     try:
         forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
     except YrException as e:
-	error = str(e)
+	    error = str(e)
         logger.error(str(e))
-    return {'icon': icon, 'temperature': temperature, 'from':time_from, 'to':time_to, 'error': error}
+    return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'from':from_dt, 'to':to_dt,
+            'from_time': from_time, 'to_time': to_time, 'weather_h1': weather_h1, 'error': error}
 
 @view_config(route_name='forecast', renderer='json')
 def forecast(request):
@@ -120,8 +133,8 @@ def forecast(request):
         else:
             return {'info': 'Pass parameters postnummer from posten or a pair of latitude, longitude.\
 The response is the current weather forecast', 'params': ['postnummer', 'latitude', 'longitude']}
-    except Exception as e:
-        message = None
+    except YrException as e:
+        message = str(e)
         request.response.status = 500
         return {'error': message, 'params': ['postnummer', 'latitude', 'longitude']}
 

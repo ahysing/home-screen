@@ -94,10 +94,14 @@ def fetch_postnummer_closest_to(latitude, longitude, radius=0.1, num_results=1, 
         response_body = response.read()
         status_code = response.getcode()
         return response_body, status_code
-    except urllib2.HTTPError, e:
-        return None, e.code
-    except urllib2.URLError, e:
-        return None, e.code
+    except urllib2.HTTPError as e:
+        message = str(e)
+        logger.error(message)
+        return None, e.getcode()
+    except urllib2.URLError as e:
+        message = str(e)
+        logger.error(message)
+        raise GeonorgeException(e)
 
 
 def lookup_postnummer_closest_to(latitude, longitude, radius=0.1, num_results=2, page=0):

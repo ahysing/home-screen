@@ -1,9 +1,17 @@
 from pyramid.config import Configurator
 
+
+def application_locale_negotiator(request):
+    if not hasattr(request, '_LOCALE_'):
+        request._LOCALE_ = request.accept_language.best_match(
+            ('no'), 'no')
+    return request._LOCALE_
+
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
-    config = Configurator(settings=settings)
+    config = Configurator(settings=settings, locale_negotiator=application_locale_negotiator)
     config.include('pyramid_chameleon')
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')

@@ -4,7 +4,7 @@
     longitude, onreadystatechange, open, readyState, replace, responseText,
     send, status
 */
-var TO_TXT = 'til'
+var dt_separator = 'til'
 var forecast_object = {
     'element': undefined,
     'credits': undefined
@@ -47,7 +47,7 @@ function updateForecastDisplay(elem, credit_elem, responseText) {
             var start_s = x['start'];
             time_from.setAttribute('datetime', start_s);
             time_from.innerText = start_s.substr(11,5);
-            time_separator.innerText = " "+ TO_TXT +" ";
+            time_separator.innerText = " "+ dt_separator +" ";
             var time_e = x['to'];
             time_to.setAttribute('datetime', time_e);
             time_to.innerText = time_e.substr(11,5);
@@ -216,15 +216,17 @@ function updateForecastDisplay(elem, credit_elem, responseText) {
         });
     }
 
-    if (credit_elem !== undefined) {
+    if (credit_elem !== undefined && forecast_result !== null && forecast_result.hasOwnProperty('credit')) {
         var a = document.createElement('a');
         var cred = forecast_result['credit'];
+        if (cred !== null && cred.hasOwnProperty('url') && cred.hasOwnProperty('text')) {
         var link = cred['url'];
         var text = cred['text'];
         a.setAttribute('href', link);
         a.innerText = text;
         credit_elem.innerText = '';
         credit_elem.appendChild(a);
+        }
     }
 }
 

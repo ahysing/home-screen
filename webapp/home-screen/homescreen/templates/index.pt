@@ -37,20 +37,20 @@
       </div>
       <div class="col-md-12">
         <section class="mail" data-mail.url="${request.route_url('mail:calendar')}">
-            <div class="authenticate ${show_authenticate}">
-              <form method="POST" action="${request.route_url('index:authenticate')}">
-                <input id="mail-username" type="email" name="username" placeholder="fornavn.etternavn@acme.com" autofocus>
-                <input id="mail-password" type="password" name="password" placeholder="passord">
-                Lagre brukernavn og passord? <input id="mail-save" type="checkbox" name="save" checked>
-                <input type="submit" value="Logg in i kalender" onclick="save_submit()">
-              </form>
-            </div>
+          <div class="authenticate ${show_authenticate}">
+            <form method="POST" action="${request.route_url('index:authenticate')}">
+              <input id="mail-username" type="email" name="username" placeholder="fornavn.etternavn@acme.com" autofocus>
+              <input id="mail-password" type="password" name="password" placeholder="passord">
+              Lagre brukernavn og passord? <input id="mail-save" type="checkbox" name="save" checked>
+              <input type="submit" value="Logg in i kalender" onclick="save_submit()">
+            </form>
+          </div>
         </section>
       </div>
         <div class="row">
-            <footer class="col-md-12">
-              <small class="forecast-credits"></small>
-            </footer>
+          <footer class="col-md-12">
+            <small class="forecast-credits"></small>
+          </footer>
         </div>
     </div>
     <!-- binds form values to storage for next time use -->
