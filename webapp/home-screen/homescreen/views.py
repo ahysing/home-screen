@@ -20,7 +20,6 @@ def my_view(request):
     one = 'one'
     return {'one': one, 'project': 'home-screen'}
 
-
 def build_error_latlong(latitude, longitude):
     return 'location not accepted latitude={0} longitude={1}'.format(latitude, longitude)
 
@@ -32,7 +31,7 @@ def transport_next_static(request):
     from_dt = '2015-01-01T00:00:00Z'
     from_time = '00:00'
     latitude = u'59.5440'         # Longitude and latitude for the center of Oslo
-    limit = 10
+    limit, error = _parse_limit_or_error(request)
     longitude = u'10.4510'        # Longitude and latitude for the center of Oslo
     stop_name = 'Oslo S'
     transport = None
@@ -53,6 +52,17 @@ def transport_next_static(request):
             'updated_txt': updated_txt, 'updated':updated, 'stop_name':stop_name,
             'transport': transport, 'error':error}
 
+def _parse_limit_or_error(request):
+    limit = 10
+    error = None
+    try:
+        limit = request.GET['limit']
+        limit = max(1, int(limit))
+    except KeyError:
+        pass
+    except ValueError:
+        error = 'Invalid limit sent to service. Expected integer got {}'.format(limit)
+    return limit, error
 
 @view_config(route_name='transport:next', renderer='json')
 def transport_next(request):
@@ -61,14 +71,7 @@ def transport_next(request):
         if 'latitude' in request.GET and 'longitude' in request.GET:
             latitude = request.GET['latitude']
             longitude = request.GET['longitude']
-            limit = None
-            try:
-                limit = request.GET['limit']
-                limit = int(limit)
-            except KeyError:
-                pass
-            except ValueError:
-                error = 'Invalid limit sent to service. Expected integer got {}'.format(limit)
+            limit, error = _parse_limit_or_error(request)
             if not input_validation.is_valid_wgs_84(latitude, longitude):
                 request.response.status = 400
                 return {'error': build_error_latlong(latitude, longitude), 'params': ['latitude', 'longitude']}
@@ -113,7 +116,7 @@ def forecast_static(request):
     try:
         forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
     except YrException as e:
-	error = str(e)
+	    error = str(e)
         logger.error(str(e))
     return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'forecast':forecast, 'from':from_dt,
             'to':to_dt, 'from_time': from_time, 'to_time': to_time, 'weather_h1': weather_h1, 'error': error}

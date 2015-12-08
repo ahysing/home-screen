@@ -16,12 +16,12 @@
           <h1>Busser fra {stop_name}</h1>
           <p>{updated_txt}{updated}></p>
         </hgroup>
-          <article tal:repeat="it transport">
-            <img src="${request.static_url('homescreen:static/bus.css')}" alt="{alt_departure_type}">
-            <span class="transport-name" tal:content="it.line_number it.line_name"></span>
-            <time class="transport-time" datetime="{from}">{from_time}</time>
-            <div class="horizontal-line"></div>
-          </article>
+        <article tal:repeat="it transport">
+          <img src="${request.static_url('homescreen:static/bus.css')}" alt="{alt_departure_type}">
+          <span class="transport-name" tal:content="it.line_number it.line_name"></span>
+          <time class="transport-time" datetime="it.from" tal:content="string:it.from"></time>
+          <div class="horizontal-line"></div>
+        </article>
       </section>
     </div>
   </body>
