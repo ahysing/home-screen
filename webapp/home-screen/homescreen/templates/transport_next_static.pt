@@ -1,25 +1,28 @@
 <!DOCTYPE html>
-<html lang="${request.locale_name}">
+<html lang="${request.locale_name}" xmlns:tal="http://xml.zope.org/namespaces/tal" xmlns:metal="http://xml.zope.org/namespaces/metal">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Personlig oversikt over kalender, vær og offentlig transport der du er nå">
     <link rel="shortcut icon" href="${request.static_url('homescreen:static/today-xxl.png')}">
-    <title>Busser fra Oslo S</title>
+    <title>Busser fra ${stop_name}</title>
     <link href="${request.static_url('homescreen:static/index.css')}" rel="stylesheet">
   </head>
   <body>
     <div class="container">
-      <section xmlns:tal="http://xml.zope.org/namespaces/tal">
+      <section>
         <hgroup>
-          <h1>Busser fra {stop_name}</h1>
-          <p>{updated_txt}{updated}></p>
+          <h1>Busser fra ${stop_name}</h1>
+          <p>${updated_txt}${updated}></p>
         </hgroup>
         <article tal:repeat="it transport">
-          <img src="${request.static_url('homescreen:static/bus.css')}" alt="{alt_departure_type}">
+          <img tal:condition="it.transport_mode EQ 'bus'" src="${request.static_url('homescreen:static/icon/bus.png')}" alt="{alt_departure_type}">
+          <img tal:condition="it.transport_mode EQ 'ferry'" src="${request.static_url('homescreen:static/icon/ferry.png')}" alt="{alt_departure_type}">
+          <img tal:condition="it.transport_mode EQ 'plane'" src="${request.static_url('homescreen:static/icon/plane.png')}" alt="{alt_departure_type}">
+          <img tal:condition="it.transport_mode EQ 'ferry'" src="${request.static_url('homescreen:static/icon/rail.png')}" alt="{alt_departure_type}">
           <span class="transport-name" tal:content="it.line_number it.line_name"></span>
-          <time class="transport-time" datetime="it.from" tal:content="string:it.from"></time>
+          <time class="transport-time" tal:attributes="datetime it.from" tal:content="it.from"></time>
           <div class="horizontal-line"></div>
         </article>
       </section>

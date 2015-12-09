@@ -27,6 +27,7 @@ def build_error_latlong(latitude, longitude):
 @view_config(route_name='transport:next:static', renderer='templates/transport_next_static.pt')
 def transport_next_static(request):
     alt_departure_type = 'Transportmiddel for avreise'
+
     error = None
     from_dt = '2015-01-01T00:00:00Z'
     from_time = '00:00'
@@ -116,7 +117,7 @@ def forecast_static(request):
     try:
         forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
     except YrException as e:
-	    error = str(e)
+        error = str(e)
         logger.error(str(e))
     return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'forecast':forecast, 'from':from_dt,
             'to':to_dt, 'from_time': from_time, 'to_time': to_time, 'weather_h1': weather_h1, 'error': error}
