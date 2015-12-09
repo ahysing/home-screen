@@ -6,7 +6,6 @@ class DepartureResponse(object):
         self.departures = []
         self.stop = None
 
-
     def __json__(self, request):
         return {'departures': self.departures, 'stop': self.stop}
 
@@ -22,7 +21,6 @@ class Stop(object):
         self.name = None
         self.zone = None
         self.is_hub = False
-
 
     def __json__(self, request):
         return {'id':self.id, 'name': self.name, 'zone':self.zone, 'is_hub':self.is_hub, 'y':self.y, 'x':self.x}
@@ -44,7 +42,6 @@ class Departure(object):
         self.delay = None
         self.vehicle_mode = None
         self.published_line_name = None
-
 
     def __json__(self, request):
         return {'vehicle_mode': self.vehicle_mode, 'line_ref': self.line_ref,

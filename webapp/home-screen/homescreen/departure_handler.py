@@ -22,9 +22,18 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         self.in_direction_ref = False
         self.in_original_aimed_departure_time = False
 
-        self.set_fields_none()
+        self.original_aimed_departure_time = None
+        self.destination_aimed_arrival_time = None
+        self.expected_departure_time = None
+        self.destination_name = None
+        self.destination_platform_name = None
+        self.destination_display = None
+        self.direction_name = None
+        self.direction_ref = None
+        self.line_ref = None
+        self.vehicle_mode = None
+        self.delay = None
         self.departures = []
-
 
     def set_fields_none(self):
         self.original_aimed_departure_time = None
@@ -38,7 +47,6 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         self.line_ref = None
         self.vehicle_mode = None
         self.delay = None
-
 
     def characters(self, content):
         if self.in_destination_name:
@@ -63,7 +71,6 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
             self.vehicle_mode = content
         elif self.in_delay:
             self.delay = content
-
 
     def startElement(self, name, attrs):
         if name == 'MonitoredStopVisit':
@@ -93,7 +100,6 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
                 elif name == 'DestinationDisplay':
                     self.in_destination_display = True
 
-
     def push_all_fields(self):
         d = Departure()
         d.delay = self.delay
@@ -107,7 +113,6 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         d.line_ref = self.line_ref
         d.vehicle_mode = self.vehicle_mode
         self.departures.append(d)
-
 
     def endElement(self, name):
         if name == 'MonitoredStopVisit':

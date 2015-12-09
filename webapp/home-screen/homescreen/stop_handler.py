@@ -11,10 +11,21 @@ class StopHandler(xml.sax.ContentHandler):
     objects.
     """
     def __init__(self):
-        self.set_all_none()
-        self.clear_flags()
-        self.stops = []
+        self.id = None
+        self.name = None
+        self.zone = None
+        self.is_hub = False
+        self.x = None
+        self.y = None
 
+        self.in_name = False
+        self.in_zone = False
+        self.in_is_hub = False
+        self.in_x = False
+        self.in_y = False
+        self.in_id = False
+
+        self.stops = []
 
     def set_all_none(self):
         self.id = None
@@ -24,15 +35,13 @@ class StopHandler(xml.sax.ContentHandler):
         self.x = None
         self.y = None
 
-
     def clear_flags(self):
-            self.in_name = False
-            self.in_zone = False
-            self.in_is_hub = False
-            self.in_x = False
-            self.in_y = False
-            self.in_id = False
-
+        self.in_name = False
+        self.in_zone = False
+        self.in_is_hub = False
+        self.in_x = False
+        self.in_y = False
+        self.in_id = False
 
     def startElement(self, name, attrs):
         if name == 'Name':
@@ -47,7 +56,6 @@ class StopHandler(xml.sax.ContentHandler):
             self.in_y = True
         elif name == 'ID':
             self.in_id = True
-
 
     def endElement(self, name):
         self.set_all_none()

@@ -20,6 +20,7 @@ def my_view(request):
     one = 'one'
     return {'one': one, 'project': 'home-screen'}
 
+
 def build_error_latlong(latitude, longitude):
     return 'location not accepted latitude={0} longitude={1}'.format(latitude, longitude)
 
@@ -53,6 +54,7 @@ def transport_next_static(request):
             'updated_txt': updated_txt, 'updated':updated, 'stop_name':stop_name,
             'transport': transport, 'error':error}
 
+
 def _parse_limit_or_error(request):
     limit = 10
     error = None
@@ -64,6 +66,7 @@ def _parse_limit_or_error(request):
     except ValueError:
         error = 'Invalid limit sent to service. Expected integer got {}'.format(limit)
     return limit, error
+
 
 @view_config(route_name='transport:next', renderer='json')
 def transport_next(request):
@@ -122,6 +125,7 @@ def forecast_static(request):
     return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'forecast':forecast, 'from':from_dt,
             'to':to_dt, 'from_time': from_time, 'to_time': to_time, 'weather_h1': weather_h1, 'error': error}
 
+
 @view_config(route_name='forecast', renderer='json')
 def forecast(request):
     try:
@@ -154,9 +158,11 @@ The response is the current weather forecast', 'params': ['postnummer', 'latitud
         request.response.status = 500
         return {'error': message, 'params': ['postnummer', 'latitude', 'longitude']}
 
+
 def _get_next_week_date():
     end = datetime.datetime.now() + datetime.timedelta(days=7)
     return end
+
 
 @view_config(route_name='mail:calendar', renderer='json')
 def mail_calendar(request):
@@ -172,6 +178,7 @@ def mail_calendar(request):
         request.response_status = 500
         return {'error': message, 'params': [], 'result': None}
 
+
 @view_config(route_name='index', renderer='templates/index.pt')
 def index(request):
     root_url = 'https://mail.bouvet.no/autodiscover/autodiscover.xml'
@@ -182,7 +189,7 @@ def index(request):
         request.response.status = 500
         return {'error': message, 'params': [], 'calendar': None,'show_authenticate': ''}
 
-#TODO: this view is not programmed yet
+
 @view_config(route_name='index:static', renderer='templates/index.pt')
 def index_static(request):
     end = _get_next_week_date()
@@ -197,6 +204,7 @@ def index_static(request):
         message = str(e)
         request.response.status = 500
         return {'error': message, 'params': [], 'calendar': None, 'show_authenticate': ''}
+
 
 @view_config(route_name='index:authenticate', renderer='templates/index.pt')
 def index_authenticate(request):

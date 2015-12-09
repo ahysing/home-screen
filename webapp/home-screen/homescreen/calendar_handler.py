@@ -3,10 +3,10 @@ import  logging
 
 logger = logging.getLogger(__name__)
 
-class ExchangeErroHandler(xml.sax.ContentHandler):
-    def __init__(self):
-        pass
 
+class ExchangeErrorHandler(xml.sax.ContentHandler):
+    def __init__(self):
+        self.in_error = False
 
     def startElement(self, name, attrs):
         if name == 'Error':
@@ -14,13 +14,13 @@ class ExchangeErroHandler(xml.sax.ContentHandler):
 
     def endElement(self, name):
         if name == 'Error':
-            end
+            pass
+
 
 class CalendarHandler(xml.sax.ContentHandler):
     def __init__(self):
         self.calendar_list = []
         self.in_title = False
-
 
     def startElement(self, name, attrs):
         if name == 'Event':

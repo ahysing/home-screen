@@ -26,7 +26,6 @@ class MailSource(object):
         self.exchange_server_host = exchange_server_host
         self.exchange_server_port = exchange_server_port
 
-
     def parse_calendar_result(self, raw, content_type):
         try:
             calendar_handler = CalendarHandler()
@@ -38,7 +37,6 @@ class MailSource(object):
             return calendar_handler.calendar_list
         except xml.sax.SAXParseException as e:
             raise MsExchangeException(e)
-
 
     def lookup_calendar_to(self, date_str):
         # Set up the connection to Exchange
