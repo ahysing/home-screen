@@ -38,7 +38,7 @@ class MailSource(object):
         except xml.sax.SAXParseException as e:
             raise MsExchangeException(e)
 
-    def lookup_calendar_to(self, date_str):
+    def lookup_calendar(self, date_start, date_end):
         # Set up the connection to Exchange
         session = requests.session()
         httml_ntlm_auth = requests_ntlm.HttpNtlmAuth(self.service_account_username, self.service_account_password)

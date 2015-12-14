@@ -20,19 +20,22 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-7">
           <section class="transport">
             <noscript>
               <iframe src="${request.route_url('transport:next:static')}"></iframe>
             </noscript>
           </section>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <section class="forecast">
             <noscript>
               <iframe src="${request.route_url('forecast:static')}"></iframe>
             </noscript>
           </section>
+          <footer>
+            <small class="forecast-credits"></small>
+          </footer>
         </div>
       </div>
       <div class="col-md-12">
@@ -47,11 +50,6 @@
           </div>
         </section>
       </div>
-        <div class="row">
-          <footer class="col-md-12">
-            <small class="forecast-credits"></small>
-          </footer>
-        </div>
     </div>
     <!-- binds form values to storage for next time use -->
     <script type="text/javascript">

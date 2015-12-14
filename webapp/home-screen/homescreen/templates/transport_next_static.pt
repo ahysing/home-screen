@@ -30,7 +30,7 @@
                                        tal:content="$line_display"></span>
           <time class="transport-time"
                 tal:attributes="datetime it.from"
-                tal:define="from_pp = python:it.from.substring(11,5)"
+                tal:define="from_pp = python:it.from[11:16]"
                 tal:replace="$from_pp">Departure</time>
           <div class="horizontal-line"></div>
         </article>

@@ -9,12 +9,20 @@ var TRANSPORT_LIMIT =  '10';
 var pt_object = {
     'element': undefined
 };
-function begForLocation(callback) {
+function begForLocation(callback, error_callback) {
     'use strict';
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(callback);
+    } else {
+        error_callback();
     }
 }
+
+function deniedLocation() {
+    console.error('location denied for public transports!');
+    setTimeout(setupTransport, 60000);
+}
+
 function iso8601_to_time_hm(time_pp) {
     'use strict';
     var time_start = time_pp.indexOf('T');
@@ -80,7 +88,7 @@ function updateTransportDisplay(elem, text) {
                     container.appendChild(route);
                 });
             } else {
-                console.error('No transport inforamtion is available.');
+                console.error('No transports are available.');
             }
 
             elem.replaceChild(container, elem.lastChild);
@@ -110,8 +118,6 @@ function requestTransportForLocation(e) {
     xhr.onreadystatechange = handleTransport;
     xhr.send();
 }
-
-
 function setupTransport() {
     'use strict';
     var transport = document.getElementsByClassName('transport');
@@ -120,9 +126,8 @@ function setupTransport() {
         pt_object.element = t;
     }
 
-    begForLocation(requestTransportForLocation);
+    begForLocation(requestTransportForLocation, deniedLocation);
 }
-
 function main() {
     'use strict';
     if (window.addEventListener) {

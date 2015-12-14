@@ -7,7 +7,8 @@
 var dt_separator = 'til'
 var forecast_object = {
     'element': undefined,
-    'credits': undefined
+    'credits': undefined,
+    'num_forecasts': 5
 };
 
 function fallback() {
@@ -27,9 +28,11 @@ function updateForecastDisplay(root, credit_root, responseText) {
     var result = JSON.parse(responseText);
     var forecast_result = result['forecast'];
     if (root !== undefined) {
+        var slice_size = forecast_object.num_forecasts;
         var forecasts = forecast_result['time_forecasts'];
-        forecasts.slice(0,5).forEach(function(x, i) {
-            var container = document.createElement('article');
+        var container = document.createElement('div');
+        forecasts.slice(0, slice_size).forEach(function(x, i) {
+            var forecast = document.createElement('article');
             var time_elem = document.createElement('div');
             var time_from = document.createElement('time');
             var time_separator = document.createElement('span');
@@ -189,26 +192,30 @@ function updateForecastDisplay(root, credit_root, responseText) {
             temperature_elem.setAttribute('class', 'temperature');
             temperature_elem.innerText = temperature + '°';
 
-            container.appendChild(temperature_elem);
+            forecast.appendChild(temperature_elem);
 
             element.setAttribute('class', s);
             element.setAttribute('title', tool_tip);
-            container.appendChild(element);
+            forecast.appendChild(element);
 
             time_elem.appendChild(time_from);
             time_elem.appendChild(time_separator);
             time_elem.appendChild(time_to);
             time_elem.setAttribute('class', 'weather-time');
-            container.appendChild(time_elem);
+            forecast.appendChild(time_elem);
 
             var separator = document.createElement('div');
             separator.setAttribute('class', 'horizontal-line');
-            container.appendChild(separator);
+            forecast.appendChild(separator);
 
-            container.setAttribute('class', 'weather-container');
+            forecast.setAttribute('class', 'weather-forecast');
 
-            root.replaceChild(container, root.lastChild);
+            container.appendChild(forecast);
         });
+
+        root.replaceChild(container, root.lastChild);
+    } else {
+        console.error('No forecasts are available.');
     }
 
     if (credit_root !== undefined && forecast_result !== null && forecast_result.hasOwnProperty('credit')) {
@@ -222,11 +229,14 @@ function updateForecastDisplay(root, credit_root, responseText) {
         credit_root.innerText = '';
         credit_root.appendChild(a);
         }
+    } else {
+        console.error('No place to attach credits for wether forecasts.');
     }
 }
 
 function deniedLocation() {
-    console.log('location denied');
+    console.error('location denied for forecasts!');
+    setTimeout(setupForecast, 60000);
 }
 
 function requestForecastForLocation(position) {

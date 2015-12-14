@@ -14,20 +14,16 @@ h6 {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 300;
 }
-
 .clock {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 500%;
   font-weight: bold;
 }
-
 .forecast-credits {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 100%;
-  font-weight: bold;
-  padding: 15px;
+  padding-top: 1em;
+  padding-bottom: 1em;
 }
-
 .forecast {
 }
 .transport * article {
