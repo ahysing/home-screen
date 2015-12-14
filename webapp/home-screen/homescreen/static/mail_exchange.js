@@ -28,48 +28,52 @@ function clearCredentials() {
     window.localStorage.removeItem(MAIL_PASSWORD_KEY);
     window.localStorage.removeItem(MAIL_SUBMIT_KEY);
 }
+function updateEventList(root, responseText) {
+    'use strict';
+    var elem = undefined;
+    var raw = undefined;
+    var event_response = undefined;
+    var events = undefined;
+    var evnt_elem = undefined;
+    var title_elem = undefined;
+    var body_elem = undefined;
+    var datetime_s_elem = undefined;
+    elem = document.getElementsByClassName('mail')[0];
+    raw = xhr.responseText;
+    event_response = JSON.parse(raw);
+    events = event_response['events'];
+    elem.innerText = '';
+    if (events) {
+        events.forEach(function(x) {
+            evnt_elem = document.createElement('article');
+            title_elem = document.createElement('title');
+            body_elem = document.createElement('div');
+            datetime_s_elem = document.createElement('div');
+            datetime_s_elem.innerText = x.from + " til " + x.to;
+            datetime_s_elem.setAttribute('class', 'horizontal-line');
+            title_elem.innerText = x.title;
+            body_elem.innerText = x.body;
 
+            evnt_elem.appendChild(title_elem);
+            evnt_elem.appendChild(body_elem);
+            evnt_elem.appendChild(datetime_s_elem);
+
+            elem.appendChild(evnt_elem);
+        });
+    }
+
+    root.replaceChild(elem, root.lastChild);
+}
 function login(username, password) {
     'use strict';
     var root_domain = mail_object.root_domain;
     var xhr = new XMLHttpRequest();
-    function updateCalendar(e) {
+    function handleCalendarResponse(e) {
         'use strict';
-        var elem = undefined;
-        var raw = undefined;
-        var event_response = undefined;
-        var events = undefined;
-        var evnt_elem = undefined;
-        var title_elem = undefined;
-        var body_elem = undefined;
-        var datetime_s_elem = undefined;
-
         if (xhr.readyState === 4) {
             switch (xhr.status) {
                 case 200:
-                    elem = document.getElementsByClassName('mail')[0];
-                    raw = xhr.responseText;
-                    event_response = JSON.parse(raw);
-                    events = event_response['events'];
-                    elem.innerText = '';
-                    if (events) {
-                        events.forEach(function(x) {
-                            evnt_elem = document.createElement('article');
-                            title_elem = document.createElement('title');
-                            body_elem = document.createElement('div');
-                            datetime_s_elem = document.createElement('div');
-                            datetime_s_elem.innerText = x.from + " til " + x.to;
-                            datetime_s_elem.setAttribute('class', 'horizontal-line');
-                            title_elem.innerText = x.title;
-                            body_elem.innerText = x.body;
-
-                            evnt_elem.appendChild(title_elem);
-                            evnt_elem.appendChild(body_elem);
-                            evnt_elem.appendChild(datetime_s_elem);
-
-                            elem.appendChild(evnt_elem);
-                        });
-                    }
+                    updateEventList(mail_object.element, xhr.reponseText);
                     break;
                 case 423:
                 case 419:
@@ -87,7 +91,7 @@ function login(username, password) {
     credentials_from.append('username', username);
     credentials_from.append('password', password);
     xhr.open('POST', root_domain);
-    xhr.onreadystatechange = updateCalendar;
+    xhr.onreadystatechange = handleCalendarResponse;
     xhr.send(credentials_from);
 }
 

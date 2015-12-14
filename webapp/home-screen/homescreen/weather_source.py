@@ -304,8 +304,9 @@ def lookup_forecast_for_postnummer(postnummer):
 
 
 def fetch_forecast_for_postnummer(postnummer):
+    postnummer_s = postnummer
     source_url_template = 'http://yr.no/sted/Norge/postnummer/{postnummer}/varsel.xml'
-    source_url = source_url_template.format(postnummer=postnummer)
+    source_url = source_url_template.format(postnummer=postnummer_s)
     logger.debug(source_url)
     request = urllib2.Request(source_url)
     try:

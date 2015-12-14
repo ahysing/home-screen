@@ -18,10 +18,9 @@ def _parse_postnummer(raw):
     for row in reader:
         zip, place, county, municipality_code, municipality, category_code, category, latitude, longitude = row
         try:
-            zip_i = int(zip)
             latitude_n = float(latitude)
             longitude_n = float(longitude)
-            zp = ZipPlace(zip_i, latitude_n, longitude_n)
+            zp = ZipPlace(zip, latitude_n, longitude_n)
             zip_dict.append(zp)
         except Exception as e:
             logger.error(str(e))
@@ -50,6 +49,7 @@ def fetch_postnummer():
 
 
 def _parse_postnummer_closest_to(raw, latitude, longitude):
+    POSTNUMMER_WORD_LENGTH = 4
     json_decoder = json.JSONDecoder()
     try:
         result = json_decoder.decode(raw)
@@ -62,6 +62,7 @@ def _parse_postnummer_closest_to(raw, latitude, longitude):
         for a in addresser:
             try:
                 postnummer = a['postnr']
+                postnummer_d = postnummer.zfill(POSTNUMMER_WORD_LENGTH)
                 cur_latitude = a['nord']
                 cur_longitude = a['aust']
                 cur_latitude_n = float(cur_latitude)
@@ -71,8 +72,8 @@ def _parse_postnummer_closest_to(raw, latitude, longitude):
                 d = math.hypot(d_x, d_y)
                 if d < current_distance:
                     current_distance = d
-                    current_postnummer = postnummer
-            except Exception, e:
+                    current_postnummer = postnummer_d
+            except ValueError as e:
                 logger.debug(str(e))
         return current_postnummer
     except Exception, e:

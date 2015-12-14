@@ -167,7 +167,7 @@ def _get_closest_stop_by_distance(stop_ids, center_x, center_y):
 
 def scan_closest_stopid_for_location(latitude, longitude):
     attempts = 0
-    distance = 87.5
+    distance = 175
     max_attempts = 6
     stop_ids = []
     logger.debug("Converting WGS84 to UTM33 latitude={0} longitude={1}".format(latitude, longitude))
@@ -258,8 +258,9 @@ def lookup_transport_for_stop(latitude, longitude, limit=-1):
     departure_response = DepartureResponse()
     stop = scan_closest_stopid_for_location(latitude, longitude)
     if stop:
-        now_text = datetime.datetime.now().isoformat()
-        response_body, status_code, content_type = fetch_transport_for_stop(stop, now_text)
+        next_hour_d = datetime.datetime.now() + datetime.timedelta(hours=1)
+        next_hour = next_hour_d.isoformat()
+        response_body, status_code, content_type = fetch_transport_for_stop(stop, next_hour)
         if status_code == 200:
             departures = _parse_transport_for_stop(response_body, content_type)
             departure_response.stop = stop

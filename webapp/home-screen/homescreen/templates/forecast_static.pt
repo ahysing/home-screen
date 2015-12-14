@@ -14,32 +14,39 @@
       <h1>${weather_h1}</h1>
     </header>
     <article class="weather-container" tabindex="-1" tal:repeat="it forecasts">
-      <span class="temperature" tal:content="it.temperature°"></span>
-      <i tal:condition="it.symbol_number_ex EQ '4'" tal:attributes="class wi wi-cloud"></i>
-      <i tal:condition="it.symbol_number_ex EQ '14'" tal:attributes="class wi wi-day-alt-snow-thunderstorm"></i>
-      <i tal:condition="it.symbol_number_ex EQ '3'" tal:attributes="class wi wi-day-cloudy"></i>
-      <i tal:condition="it.symbol_number_ex EQ '7'" tal:attributes="class wi wi-day-rain"></i>
-      <i tal:condition="it.symbol_number_ex EQ '25'" tal:attributes="class wi wi-day-showers"></i>
-      <i tal:condition="it.symbol_number_ex EQ '30'" tal:attributes="class wi wi-day-sleet-storm"></i>
-      <i tal:condition="it.symbol_number_ex EQ '12'" tal:attributes="class wi wi-day-sleet"></i>
-      <i tal:condition="it.symbol_number_ex EQ '13'" tal:attributes="class wi wi-day-sleet"></i>
-      <i tal:condition="it.symbol_number_ex EQ '14'" tal:attributes="class wi wi-day-snow-thunderstorm"></i>
-      <i tal:condition="it.symbol_number_ex EQ '8'" tal:attributes="class wi wi-day-snow"></i>
-      <i tal:condition="it.symbol_number_ex EQ '47'" tal:attributes="class wi wi-day-sprinkle"></i>
-      <i tal:condition="it.symbol_number_ex EQ '2'" tal:attributes="class wi wi-day-sunny-overcast"></i>
-      <i tal:condition="it.symbol_number_ex EQ '1'" tal:attributes="class wi wi-day-sunny"></i>
-      <i tal:condition="it.symbol_number_ex EQ '14'" tal:attributes="class wi wi-day-thunderstorm"></i>
-      <i tal:condition="it.symbol_number_ex EQ '15'" tal:attributes="class wi wi-fog"></i>
-      <i tal:condition="it.symbol_number_ex EQ '5'" tal:attributes="class wi wi-hail"></i>
-      <i tal:condition="it.symbol_number_ex EQ '11'" tal:attributes="class wi wi-lightning"></i>
-      <i tal:condition="it.symbol_number_ex EQ 'NaN'" tal:attributes="class wi wi-na"></i>
-      <i tal:condition="it.symbol_number_ex EQ '48'" tal:attributes="class wi wi-rain-mix"></i>
-      <i tal:condition="it.symbol_number_ex EQ '46'" tal:attributes="class wi wi-raindrop"></i>
-      <i tal:condition="it.symbol_number_ex EQ '42'" tal:attributes="class wi wi-sleet"></i>
-      <i tal:condition="it.symbol_number_ex EQ '49'" tal:attributes="class wi wi-snow"></i>
-      <i tal:condition="it.symbol_number_ex EQ '50'" tal:attributes="class wi wi-snowflake-cold"></i>
-      <i tal:condition="it.symbol_number_ex EQ '25'" tal:attributes="class wi wi-storm-showers"></i>
-      <span class="time"><time tal:attributes="datetime it.from" tal:content="it.from"></time><span> ${dt_separator} </span> <time tal:attributes="datetime it.to" tal:content="it.to"></time></span>
+      <span class="temperature" tal:content="string:it.temperature°"></span>
+      <span tal:switch="it.symbol_number_ex">
+        <i tal:case="'4'" tal:attributes="class string:wi wi-cloud"></i>
+        <i tal:case="'14'" tal:attributes="class string:wi wi-day-alt-snow-thunderstorm"></i>
+        <i tal:case="'3'" tal:attributes="class string:wi wi-day-cloudy"></i>
+        <i tal:case="'7'" tal:attributes="class string:wi wi-day-rain"></i>
+        <i tal:case="'25'" tal:attributes="class string:wi wi-day-showers"></i>
+        <i tal:case="'30'" tal:attributes="class string:wi wi-day-sleet-storm"></i>
+        <i tal:case="'12'" tal:attributes="class string:wi wi-day-sleet"></i>
+        <i tal:case="'13'" tal:attributes="class string:wi wi-day-sleet"></i>
+        <i tal:case="'14'" tal:attributes="class string:wi wi-day-snow-thunderstorm"></i>
+        <i tal:case="'8'" tal:attributes="class string:wi wi-day-snow"></i>
+        <i tal:case="'47'" tal:attributes="class string:wi wi-day-sprinkle"></i>
+        <i tal:case="'2'" tal:attributes="class string:wi wi-day-sunny-overcast"></i>
+        <i tal:case="'1'" tal:attributes="class string:wi wi-day-sunny"></i>
+        <i tal:case="'14'" tal:attributes="class string:wi wi-day-thunderstorm"></i>
+        <i tal:case="'15'" tal:attributes="class string:wi wi-fog"></i>
+        <i tal:case="'5'" tal:attributes="class string:wi wi-hail"></i>
+        <i tal:case="'11'" tal:attributes="class string:wi wi-lightning"></i>
+        <i tal:case="'NaN'" tal:attributes="class string:wi wi-na"></i>
+        <i tal:case="'48'" tal:attributes="class string:wi wi-rain-mix"></i>
+        <i tal:case="'46'" tal:attributes="class string:wi wi-raindrop"></i>
+        <i tal:case="'42'" tal:attributes="class string:wi wi-sleet"></i>
+        <i tal:case="'49'" tal:attributes="class string:wi wi-snow"></i>
+        <i tal:case="'50'" tal:attributes="class string:wi wi-snowflake-cold"></i>
+        <i tal:case="'25'" tal:attributes="class string:wi wi-storm-showers"></i>
+        <i tal:case="default" tal:attributes="class string:wi wi-na default"></i>
+      </span>
+      <span class="time"><time tal:attributes="datetime string:it.from"
+                               tal:define="from_pp = python: it.from.substr('','');"
+                               tal:content="$from_pp"></time><span> ${dt_separator} </span><time tal:attributes="datetime it.to"
+                                                                                                 tal:define="to_tt = ti.to"
+                                                                                                 tal:content="$to_tt"></time></span>
     </article>
     <link href="${request.static_url('homescreen:static/w/css/weather-icons.min.css')}" type="text/css" rel="stylesheet">
     <link href="${request.static_url('homescreen:static/w/css/weather-icons-wind.min.css')}" type="text/css" rel="stylesheet">

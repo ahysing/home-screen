@@ -17,12 +17,21 @@
           <p>${updated_txt}${updated}></p>
         </hgroup>
         <article tal:repeat="it transport">
-          <img tal:condition="it.transport_mode EQ 'bus'" src="${request.static_url('homescreen:static/icon/bus.png')}" alt="{alt_departure_type}">
-          <img tal:condition="it.transport_mode EQ 'ferry'" src="${request.static_url('homescreen:static/icon/ferry.png')}" alt="{alt_departure_type}">
-          <img tal:condition="it.transport_mode EQ 'plane'" src="${request.static_url('homescreen:static/icon/plane.png')}" alt="{alt_departure_type}">
-          <img tal:condition="it.transport_mode EQ 'ferry'" src="${request.static_url('homescreen:static/icon/rail.png')}" alt="{alt_departure_type}">
-          <span class="transport-name" tal:content="it.line_number it.line_name"></span>
-          <time class="transport-time" tal:attributes="datetime it.from" tal:content="it.from"></time>
+          <span tal:switch="it.transport_mode">
+            <img tal:case="0" src="${request.static_url('homescreen:static/icon/bus.png')}" alt="{alt_departure_type}">
+            <img tal:case="'bus'" src="${request.static_url('homescreen:static/icon/bus.png')}" alt="{alt_departure_type}">
+            <img tal:case="1" src="${request.static_url('homescreen:static/icon/ferry.png')}" alt="{alt_departure_type}">
+            <img tal:case="'ferry'" src="${request.static_url('homescreen:static/icon/ferry.png')}" alt="{alt_departure_type}">
+            <img tal:case="'plane'" src="${request.static_url('homescreen:static/icon/plane.png')}" alt="{alt_departure_type}">
+            <img tal:case="'rail'" src="${request.static_url('homescreen:static/icon/rail.png')}" alt="{alt_departure_type}">
+            <img tal:case="default" src="${request.static_url('homescreen:static/icon/unknown.png')}" alt="{alt_departure_type}"
+          </span>
+          <span class="transport-name" tal:define="line_display = it.line_number + it.line_name"
+                                       tal:content="$line_display"></span>
+          <time class="transport-time"
+                tal:attributes="datetime it.from"
+                tal:define="from_pp = python:it.from.substring(11,5)"
+                tal:replace="$from_pp">Departure</time>
           <div class="horizontal-line"></div>
         </article>
       </section>

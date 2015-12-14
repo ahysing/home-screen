@@ -15,7 +15,7 @@ function begForLocation(callback) {
         navigator.geolocation.getCurrentPosition(callback);
     }
 }
-function iso8601_to_timehm(time_pp) {
+function iso8601_to_time_hm(time_pp) {
     'use strict';
     var time_start = time_pp.indexOf('T');
     return time_pp.slice(time_start+1, time_start+6);
@@ -26,11 +26,6 @@ function updateTransportDisplay(elem, text) {
         var obj = JSON.parse(text);
         if (obj) {
             var container = document.createElement('div');
-
-            while (elem.hasChildNodes()) {
-                elem.removeChild(elem.lastChild);
-            }
-
             var transports = obj['transport'];
             var d = undefined;
             if (transports) {
@@ -72,10 +67,10 @@ function updateTransportDisplay(elem, text) {
                     display_txt.innerText = x ['line_ref'] + ' ' + destination_name;
                     display_txt.setAttribute('class', 'transport-name');
                     var dt = x['destination_aimed_arrival_time'];
-                    var time_pp = iso8601_to_timehm(dt);
+                    var time_pp = iso8601_to_time_hm(dt);
                     time_txt.setAttribute('class', 'transport-time');
                     time_txt.setAttribute('datetime', dt);
-                    time_txt.innerText = time_pp
+                    time_txt.innerText = time_pp;
 
                     h_line.setAttribute('class', 'horizontal-line');
                     route.appendChild(icon);
@@ -88,7 +83,7 @@ function updateTransportDisplay(elem, text) {
                 console.error('No transport inforamtion is available.');
             }
 
-            elem.appendChild(container);
+            elem.replaceChild(container, elem.lastChild);
         }
     }
 }

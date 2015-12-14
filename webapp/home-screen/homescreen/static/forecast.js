@@ -23,16 +23,11 @@ function begForLocation(callback, err_callback) {
     }
 }
 
-function updateForecastDisplay(elem, credit_elem, responseText) {
+function updateForecastDisplay(root, credit_root, responseText) {
     var result = JSON.parse(responseText);
     var forecast_result = result['forecast'];
-    if (elem !== undefined) {
+    if (root !== undefined) {
         var forecasts = forecast_result['time_forecasts'];
-
-        while (elem.hasChildNodes()) {
-            elem.removeChild(elem.lastChild);
-        }
-
         forecasts.slice(0,5).forEach(function(x, i) {
             var container = document.createElement('article');
             var time_elem = document.createElement('div');
@@ -212,11 +207,11 @@ function updateForecastDisplay(elem, credit_elem, responseText) {
 
             container.setAttribute('class', 'weather-container');
 
-            elem.appendChild(container);
+            root.replaceChild(container, root.lastChild);
         });
     }
 
-    if (credit_elem !== undefined && forecast_result !== null && forecast_result.hasOwnProperty('credit')) {
+    if (credit_root !== undefined && forecast_result !== null && forecast_result.hasOwnProperty('credit')) {
         var a = document.createElement('a');
         var cred = forecast_result['credit'];
         if (cred !== null && cred.hasOwnProperty('url') && cred.hasOwnProperty('text')) {
@@ -224,8 +219,8 @@ function updateForecastDisplay(elem, credit_elem, responseText) {
         var text = cred['text'];
         a.setAttribute('href', link);
         a.innerText = text;
-        credit_elem.innerText = '';
-        credit_elem.appendChild(a);
+        credit_root.innerText = '';
+        credit_root.appendChild(a);
         }
     }
 }
