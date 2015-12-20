@@ -14,31 +14,32 @@
   <body>
     <div class="container">
       <div class="row">
-        <div class="col-md-12">
+        <span class="col-md-12">
           <section class="clock" accesskey="c C k K">
           </section>
-        </div>
+        </span>
       </div>
       <div class="row">
-        <div class="col-md-7">
+        <span class="col-md-6">
           <section class="transport">
             <noscript>
-              <iframe src="${request.route_url('transport:next:static')}"></iframe>
+              <iframe scrolling="no" src="${request.route_url('transport:next:static')}"></iframe>
             </noscript>
           </section>
-        </div>
-        <div class="col-md-3">
+        </span>
+        <span class="col-md-5">
           <section class="forecast">
             <noscript>
-              <iframe src="${request.route_url('forecast:static')}"></iframe>
+              <iframe scrolling="no" align="right" src="${request.route_url('forecast:static')}"></iframe>
             </noscript>
+            <footer>
+              <small class="forecast-credits"></small>
+            </footer>
           </section>
-          <footer>
-            <small class="forecast-credits"></small>
-          </footer>
-        </div>
+        </span>
       </div>
-      <div class="col-md-12">
+      <!--
+      <span class="col-md-12">
         <section class="mail" data-mail.url="${request.route_url('mail:calendar')}">
           <div class="authenticate ${show_authenticate}">
             <form method="POST" action="${request.route_url('index:authenticate')}">
@@ -49,7 +50,8 @@
             </form>
           </div>
         </section>
-      </div>
+      </span>
+      -->
     </div>
     <!-- binds form values to storage for next time use -->
     <script type="text/javascript">
@@ -86,8 +88,8 @@
             localStorage.removeItem(MAIL_PASSWORD_KEY);
         }
     }
-    document.getElementById('mail-username').addEventListener('input', save_username);
-    document.getElementById('mail-password').addEventListener('input', save_password);
+    if (document.getElementById('mail-username')) document.getElementById('mail-username').addEventListener('input', save_username);
+    if (document.getElementById('mail-password')) document.getElementById('mail-password').addEventListener('input', save_password);
     </script>
     <script src="${request.static_url('homescreen:static/clock.js')}" defer='defer'></script>
     <script src="${request.static_url('homescreen:static/forecast.js')}" defer='defer'></script>

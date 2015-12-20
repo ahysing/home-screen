@@ -43,12 +43,12 @@
         <i tal:case="default" tal:attributes="class string:wi wi-na default"></i>
       </span>
       <span class="time"> <time tal:attributes="datetime string:it.from"
-                               tal:define="python: from_pp = it.from[11:16]"
-                               tal:content="$from_pp">
+                               tal:define=" from_pp python:it.from[11:16]"
+                               tal:content="from_pp">
                           </time><span> ${dt_separator} </span>
                           <time tal:attributes="datetime it.to"
-                               tal:define="python: to_tt = ti.to[11:16]"
-                               tal:content="$to_tt"></time>
+                               tal:define="to_pp python:ti.to[11:16]"
+                               tal:content="to_pp"></time>
       </span>
     </article>
     <link href="${request.static_url('homescreen:static/w/css/weather-icons.min.css')}" type="text/css" rel="stylesheet">

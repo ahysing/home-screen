@@ -7,9 +7,18 @@ class WeatherResponse(object):
     def __init__(self):
         self.credit = None
         self.time_forecasts = []
+        self.place = None
 
     def __json__(self, request):
-        return {'credit': self.credit, 'time_forecasts': self.time_forecasts}
+        return {'credit': self.credit, 'place': self.place, 'time_forecasts': self.time_forecasts}
+
+
+class Place(object):
+    def __init__(self):
+        self.name = None
+
+    def __json__(self, request):
+        return {'name': self.name}
 
 
 class Credit(object):

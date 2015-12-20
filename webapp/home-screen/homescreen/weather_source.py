@@ -2,7 +2,7 @@
 import urllib2
 import xml, xml.sax
 import cStringIO
-from homescreen.weather import WeatherResponse, Credit, Time
+from homescreen.weather import WeatherResponse, Credit, Time, Place
 import logging
 
 logger = logging.getLogger(__name__)
@@ -242,13 +242,16 @@ class WeatherHandler(xml.sax.handler.ContentHandler):
         self.time_forecasts = []
         self.in_tabular = False
         self.in_credit = False
+        self.in_name = False
         self.time = Time()
         self.credit = Credit()
+        self.place = Place()
 
     def startElement(self, name, attrs):
-
         if name == 'tabular':
             self.in_tabular = True
+        if name == 'name':
+            self.in_name = True
         elif name == 'credit':
             self.in_credit = True
         elif self.in_tabular:
@@ -275,6 +278,12 @@ class WeatherHandler(xml.sax.handler.ContentHandler):
             self.in_credit = False
         elif name == 'time' and self.in_tabular:
             self.time_forecasts.append(self.time)
+        elif name == 'name':
+            self.in_name = False
+
+    def characters(self, content):
+        if self.in_name:
+            self.place.name = content
 
 
 def _parse_forecast(raw):
@@ -287,6 +296,7 @@ def _parse_forecast(raw):
         stream.close()
         wr = WeatherResponse()
         wr.credit = weather_handler.credit
+        wr.place = weather_handler.place
         wr.time_forecasts = weather_handler.time_forecasts
         return wr
     except xml.sax.SAXParseException as e:

@@ -129,9 +129,8 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
     :return:
     """
     # TODO: coordinates paramter
-    url_template = 'http://reisapi.ruter.no/Place/GetClosestStops?coordinates=(x={easting},y={northing})&proposals={proposals}&maxdistance={distance}'
-    proposals = 3
-    source_url = url_template.format(proposals=int(proposals), distance=int(distance), easting=easting, northing=northing)
+    url_template = 'http://reisapi.ruter.no/Place/GetClosestStops?coordinates=(x={easting},y={northing})&maxdistance={distance}'
+    source_url = url_template.format(distance=int(distance), easting=easting, northing=northing)
     logger.debug(source_url)
     request = urllib2.Request(source_url, headers={'Accepts': 'application/xml'})
     try:
@@ -167,7 +166,7 @@ def _get_closest_stop_by_distance(stop_ids, center_x, center_y):
 
 def scan_closest_stopid_for_location(latitude, longitude):
     attempts = 0
-    distance = 175
+    distance = 500
     max_attempts = 6
     stop_ids = []
     logger.debug("Converting WGS84 to UTM33 latitude={0} longitude={1}".format(latitude, longitude))

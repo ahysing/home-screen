@@ -1,18 +1,21 @@
 /*property
     addEventListener, coords, element, geolocation, getCurrentPosition,
-    getElementsByClassName, innerText, latitude, length, location, log,
+    getElementsByClassName, textContent, latitude, length, location, log,
     longitude, onreadystatechange, open, readyState, replace, responseText,
     send, status
 */
 var ALT_ICN = 'Transportmiddel for avreise';
 var TRANSPORT_LIMIT =  '10';
+var TRANSPORT_POLL_DELAY = 3600000;
+var TRANSPORT_RETRY_DELAY = 6000;
+
 var pt_object = {
     'element': undefined
 };
 function begForLocation(callback, error_callback) {
     'use strict';
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(callback);
+        navigator.geolocation.getCurrentPosition(callback, error_callback);
     } else {
         error_callback();
     }
@@ -20,7 +23,7 @@ function begForLocation(callback, error_callback) {
 
 function deniedLocation() {
     console.error('location denied for public transports!');
-    setTimeout(setupTransport, 60000);
+    setTimeout(startPollingTransport, TRANSPORT_RETRY_DELAY);
 }
 
 function iso8601_to_time_hm(time_pp) {
@@ -41,6 +44,9 @@ function updateTransportDisplay(elem, text) {
             }
 
             if (Array.isArray(d)) {
+                var stop_text = document.createElement('h1')
+                stop_text.textContent = transports['stop']['name'];
+                container.appendChild(stop_text);
                 d.forEach(function(x) {
                     var route = document.createElement('article');
                     var icon = document.createElement('img');
@@ -72,13 +78,13 @@ function updateTransportDisplay(elem, text) {
                     icon.setAttribute('alt', ALT_ICN);
 
                     var destination_name = x['destination_name'];
-                    display_txt.innerText = x ['line_ref'] + ' ' + destination_name;
+                    display_txt.textContent = x ['line_ref'] + ' ' + destination_name;
                     display_txt.setAttribute('class', 'transport-name');
                     var dt = x['destination_aimed_arrival_time'];
                     var time_pp = iso8601_to_time_hm(dt);
                     time_txt.setAttribute('class', 'transport-time');
                     time_txt.setAttribute('datetime', dt);
-                    time_txt.innerText = time_pp;
+                    time_txt.textContent = time_pp;
 
                     h_line.setAttribute('class', 'horizontal-line');
                     route.appendChild(icon);
@@ -118,6 +124,10 @@ function requestTransportForLocation(e) {
     xhr.onreadystatechange = handleTransport;
     xhr.send();
 }
+function startPollingTransport() {
+    'use strict';
+    begForLocation(requestTransportForLocation, deniedLocation);
+}
 function setupTransport() {
     'use strict';
     var transport = document.getElementsByClassName('transport');
@@ -126,8 +136,10 @@ function setupTransport() {
         pt_object.element = t;
     }
 
-    begForLocation(requestTransportForLocation, deniedLocation);
+    startPollingTransport();
+    setInterval(startPollingTransport(), TRANSPORT_POLL_DELAY);
 }
+
 function main() {
     'use strict';
     if (window.addEventListener) {

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.response import Response
+import sys
 from pyramid.view import view_config
 import input_validation
 import zip_place_source
@@ -27,6 +28,7 @@ def build_error_latlong(latitude, longitude):
 
 @view_config(route_name='transport:next:static', renderer='templates/transport_next_static.pt')
 def transport_next_static(request):
+    fname = sys._getframe().f_code.co_name
     alt_departure_type = 'Transportmiddel for avreise'
 
     error = None
@@ -45,7 +47,7 @@ def transport_next_static(request):
         longitude = request.GET['longitude']
 
     try:
-        logger.debug('transport_next latitude={0} longitude={1}'.format(latitude, longitude))
+        logger.info('%s latitude=%s longitude=%s', fname, latitude, longitude)
         transport = public_transport_source.lookup_transport_for_stop(latitude, longitude, limit=limit)
     except RuterException as e:
         error = str(e)
@@ -70,6 +72,7 @@ def _parse_limit_or_error(request):
 
 @view_config(route_name='transport:next', renderer='json')
 def transport_next(request):
+    fname = sys._getframe().f_code.co_name
     error = None
     try:
         if 'latitude' in request.GET and 'longitude' in request.GET:
@@ -77,14 +80,15 @@ def transport_next(request):
             longitude = request.GET['longitude']
             limit, error = _parse_limit_or_error(request)
             if not input_validation.is_valid_wgs_84(latitude, longitude):
+                logger.info('%s invalid parameter', fname)
                 request.response.status = 400
                 return {'error': build_error_latlong(latitude, longitude), 'params': ['latitude', 'longitude']}
             else:
                 if type(limit) == int:
-                    logger.debug('transport_next latitude={0} longitude={1} limit={2}'.format(latitude, longitude, limit))
+                    logger.info('%s latitude=%s longitude=%s limit=%s', fname, latitude, longitude, limit)
                     transport = public_transport_source.lookup_transport_for_stop(latitude, longitude, limit=limit)
                 else:
-                    logger.debug('transport_next latitude={0} longitude={1}'.format(latitude, longitude))
+                    logger.info('%s latitude=%s longitude=%s',fname, latitude, longitude)
                     transport = public_transport_source.lookup_transport_for_stop(latitude, longitude)
                 return {'error': error, 'transport': transport}
         else:
@@ -100,6 +104,7 @@ The response is the next public transport departures. Optionally pass limit for 
 
 @view_config(route_name='forecast:static', renderer='templates/forecast_static.pt')
 def forecast_static(request):
+    fname = sys._getframe().f_code.co_name
     dt_separator = 'til'
     error = None
     forecast = None
@@ -112,50 +117,68 @@ def forecast_static(request):
     to_time = '00:00'
     weather_h1 = 'Været for Oslo'
     if 'postnummer' in request.GET:
-            postnummer = request.GET['postnummer']
-            if not input_validation.is_valid_postnummer(postnummer):
-                request.response.status = 400
-                return {'error': 'postnummer not accepted', 'params': ['postnummer']}
-
+        postnummer = request.GET['postnummer']
+        logger.info('%s postnummer=%s',fname, postnummer)
+        if not input_validation.is_valid_postnummer(postnummer):
+            request.response.status = 400
+            return {'error': 'postnummer not accepted', 'params': ['postnummer']}
+    else:
+        logger.info('%s',fname)
     try:
-        forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
+        f = weather_source.lookup_forecast_for_postnummer(postnummer)
     except YrException as e:
         error = str(e)
         logger.error(str(e))
-    return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'forecast':forecast, 'from':from_dt,
+    return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'forecast':[f], 'from':from_dt,
             'to':to_dt, 'from_time': from_time, 'to_time': to_time, 'weather_h1': weather_h1, 'error': error}
+
+
+def _lookup_forecasts_for_lat_long(latitude, longitude):
+    fname = sys._getframe().f_code.co_name
+    logger.debug('%s', fname)
+    zip_places = zip_place_source.lookup_postnummer_closest_to(latitude, longitude)
+    forecast = []
+    for zp in zip_places:
+        f = weather_source.lookup_forecast_for_postnummer(zp.zip)
+        forecast.append(f)
+    return forecast
 
 
 @view_config(route_name='forecast', renderer='json')
 def forecast(request):
+    fname = sys._getframe().f_code.co_name
     try:
         if 'postnummer' in request.GET:
             postnummer = request.GET['postnummer']
+            logger.info('%s postnummer=%s',fname, postnummer)
             if not input_validation.is_valid_postnummer(postnummer):
                 request.response.status = 400
                 return {'error': 'postnummer not accepted', 'params': ['postnummer']}
             else:
-                forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
-                return {'error': None, 'forecast': forecast}
-        if 'latitude' in request.GET and 'longitude' in request.GET:
+                f = weather_source.lookup_forecast_for_postnummer(postnummer)
+                return {'error': None, 'forecast': [f]}
+        elif 'latitude' in request.GET and 'longitude' in request.GET:
             latitude = request.GET['latitude']
             longitude = request.GET['longitude']
+            logger.info('%s latitude=%s longitude=%s',fname, latitude, longitude)
             if not input_validation.is_valid_wgs_84(latitude, longitude):
                 request.response.status = 400
                 return {'error': build_error_latlong(latitude, longitude), 'params': ['latitude', 'longitude']}
             else:
-                postnummer = zip_place_source.lookup_postnummer_closest_to(latitude, longitude)
-                forecast = weather_source.lookup_forecast_for_postnummer(postnummer)
+                forecast = _lookup_forecasts_for_lat_long(latitude, longitude)
                 return {'error': None, 'forecast': forecast}
         elif len(request.params) > 0:
+            logger.info('%s invalid parameters',fname)
             request.response.status = 400
             return {'error': 'Missing parameters', 'params': ['postnummer', 'latitude', 'longitude']}
         else:
-            return {'info': 'Pass parameters postnummer from posten or a pair of latitude, longitude.\
+            logger.info('%s',fname)
+            return {'info': 'Pass parameters postnummer from posten or a pair of latitude, longitude. \
 The response is the current weather forecast', 'params': ['postnummer', 'latitude', 'longitude']}
     except YrException as e:
         message = str(e)
         request.response.status = 500
+        logger.error(message)
         return {'error': message, 'params': ['postnummer', 'latitude', 'longitude']}
 
 
