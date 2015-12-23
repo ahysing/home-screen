@@ -4,6 +4,10 @@ runtime: python27
 instance_class: B1
 api_version: 1
 threadsafe: yes
+basic_scaling:
+  max_instances: 4
+  idle_timeout: 10m
+
 
 handlers:
 - url: /favicon\.ico
