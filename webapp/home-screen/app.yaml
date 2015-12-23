@@ -1,6 +1,7 @@
 application: home-screen-1149
-version: 1
+version: 2
 runtime: python27
+instance_class: B1
 api_version: 1
 threadsafe: yes
 
@@ -10,7 +11,6 @@ handlers:
   upload: homescreen/static/favicon\.ico
 - url: /static
   static_dir: homescreen/static
-
 - url: .*
   script: main.app
 
