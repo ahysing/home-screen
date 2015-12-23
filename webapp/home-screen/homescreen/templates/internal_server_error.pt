@@ -20,7 +20,7 @@
               <h1>Ops!</h1>
               <h2>Nå har det skjedd noe galt i severen</h2>
             </hgroup>
-            <img href="${request.static_url('homescreen:static/icon/internal_server_error.png')}" alt="A picture of an ambulance">
+            <img src="${request.static_url('homescreen:static/icon/internal_server_error.png')}" alt="A picture of an ambulance">
           </section>
         </span>
       </div>

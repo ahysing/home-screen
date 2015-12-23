@@ -20,7 +20,7 @@
               <h1>Denne ressursern kjenner vi ikke</h1>
               <h2>Verifiser webadressen eller kontakt kilden for å tilsendt en ny en</h2>
             </hgroup>
-            <img href="${request.static_url('homescreen:static/icon/not_found.png')}" alt="We are looking for your page">
+            <img src="${request.static_url('homescreen:static/icon/not_found.png')}" alt="We are looking for your page">
           </section>
         </span>
       </div>
