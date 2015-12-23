@@ -1,12 +1,7 @@
-"""
-`appengine_config.py` is automatically loaded when Google App Engine
-starts a new instance of your application. This runs before any
-WSGI applications specified in app.yaml are loaded.
-"""
-
+#!/usr/bin/env python
 from google.appengine.ext import vendor
 
-# Third-party libraries are stored in "lib", vendoring will make
-# sure that they are importable by the application.
+# Add any libraries installed in the "lib" folder.
 vendor.add('lib')
-
+# https://cloud.google.com/appengine/docs/python/tools/libraries27#vendoring
+# vendor.add(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib'))

@@ -134,10 +134,9 @@ function setupTransport() {
     if (transport.length > 0) {
         var t = transport[0];
         pt_object.element = t;
+        startPollingTransport();
+        setInterval(startPollingTransport, TRANSPORT_POLL_DELAY);
     }
-
-    startPollingTransport();
-    setInterval(startPollingTransport(), TRANSPORT_POLL_DELAY);
 }
 
 function main() {

@@ -19,14 +19,18 @@ h6 {
   font-size: 500%;
   font-weight: bold;
 }
+.forecast {
+  font-size: 28px;
+  padding: 15px;
+}
 .forecast-credits {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding-top: 1em;
   padding-bottom: 1em;
 }
-.transport * article, .transport * h1 {
-  padding: 15px;
-  font-size: 200%;
+.transport {
+  font-size: 28px;
+    padding: 15px;
 }
 .temperature {
   font-weight: bold;
@@ -39,7 +43,7 @@ h6 {
   left: 50%;
   display:inline;
 }
-i.wi, .transport * img {
+.transport * img {
   padding: 15px;
   font-size: xx-large;
 }
@@ -47,12 +51,11 @@ i.wi, .transport * img {
   left: 50%;
   display:inline;
 }
-.weather-forecast {
-  font-size: 200%;
-  padding: 15px;
-}
 .weather-time time {
   font-weight: bold;
+}
+.weather-icon {
+  padding: 15px;
 }
 i[title]:hover:after {
   font-size: 200%;
@@ -84,4 +87,8 @@ iframe {
   overflow: hidden;
   height: 1024px;
   width: 100%;
+}
+.fill-screen {
+  font-size: 64px;
+  font-size: 40vw;
 }

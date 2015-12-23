@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="${request.locale_name}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personlig oversikt over kalender, vær og offentlig transport der du er nå">
+    <link rel="shortcut icon" href="${request.static_url('homescreen:static/today-xxl.png')}">
+    <title>Feil adresse</title>
+    <!-- Bootstrap core CSS -->
+    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${request.static_url('homescreen:static/index.css')}" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <span class="col-md-12">
+          <section class="message" accesskey="i">
+            <hgroup>
+              <h1>Denne ressursern kjenner vi ikke</h1>
+              <h2>Verifiser webadressen eller kontakt kilden for å tilsendt en ny en</h2>
+            </hgroup>
+            <i class="wi wi-na fill-screen"></i>
+          </section>
+        </span>
+      </div>
+    </div>
+    <script src="${request.static_url('homescreen:static/clock.js')}" defer='defer'></script>
+    <script src="${request.static_url('homescreen:static/forecast.js')}" defer='defer'></script>
+    <link href="${request.static_url('homescreen:static/w/css/weather-icons.min.css')}" type="text/css" rel="stylesheet">
+    <link href="${request.static_url('homescreen:static/w/css/weather-icons-wind.min.css')}" type="text/css" rel="stylesheet">
+    <script src="${request.static_url('homescreen:static/public_transport.js')}" defer='defer'></script>
+    <script src="${request.static_url('homescreen:static/mail_exchange.js')}" defer='defer'></script>
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+  </body>
+</html>

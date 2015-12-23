@@ -1,5 +1,8 @@
 from pyramid.config import Configurator
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 def application_locale_negotiator(request):
     if not hasattr(request, '_LOCALE_'):
@@ -14,8 +17,7 @@ def main(global_config, **settings):
     config = Configurator(settings=settings, locale_negotiator=application_locale_negotiator)
     config.include('pyramid_chameleon')
     config.add_static_view('static', 'static', cache_max_age=3600)
-    config.add_route('home', '/')
-    config.add_route('index', '/index')
+    config.add_route('index', '/')
     config.add_route('index:authenticate', '/index/authenticate')
     config.add_route('index:static', '/index/static')
     config.add_route('transport:next', '/transport/next')
@@ -25,7 +27,9 @@ def main(global_config, **settings):
     config.add_route('mail:calendar', '/mail/calendar')
 
     config.scan()
-    return config.make_wsgi_app()
+    app = config.make_wsgi_app()
+    logger.debug('Returning WGSI app' + str(app))
+    return app
 
 #__here__ = os.path.dirname(os.path.abspath(__file__))
 

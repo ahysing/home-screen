@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyramid.response import Response
 import sys
-from pyramid.view import view_config
+from pyramid.view import view_config, notfound_view_config
 import input_validation
 import zip_place_source
 import weather_source
@@ -15,12 +15,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+@notfound_view_config(renderer = 'templates/not_found.pt')
+def not_found(request):
+    request.response.status = 404
+    return {}
 
-@view_config(route_name='home', renderer='templates/mytemplate.pt')
-def my_view(request):
-    one = 'one'
-    return {'one': one, 'project': 'home-screen'}
-
+@view_config(context=Exception, renderer = 'templates/internal_server_error.pt')
+def internal_server_error(request):
+    return {}
 
 def build_error_latlong(latitude, longitude):
     return 'location not accepted latitude={0} longitude={1}'.format(latitude, longitude)

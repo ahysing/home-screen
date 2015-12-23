@@ -57,129 +57,129 @@ function updateForecastDisplay(root, credit_root, responseText) {
                 time_to.textContent = time_e.substr(11,5);
 
                 var symbol = parseInt(x['symbol_number_ex']);
-                var s = 'wi';
+                var s = '';
                 // http://om.yr.no/forklaring/symbol/
                 switch (symbol) {
                     case 1:
-                        s = 'wi wi-day-sunny';
+                        s = 'wi-day-sunny';
                         break;
                     case 2:
-                        s = 'wi wi-day-sunny-overcast';
+                        s = 'wi-day-sunny-overcast';
                         break;
                     case 3:
-                        s = 'wi wi-day-cloudy';
+                        s = 'wi-day-cloudy';
                         break;
                     case 4:
-                        s = 'wi wi-cloud';
+                        s = 'wi-cloud';
                         break;
                     case 5:
-                        s = 'wi wi-hail';
+                        s = 'wi-hail';
                         break;
                     case 6:
-                        s = 'wi wi-day-sleet-storm';
+                        s = 'wi-day-sleet-storm';
                         break;
                     case 7:
-                        s = 'wi wi-day-rain';
+                        s = 'wi-day-rain';
                         break;
                     case 8:
-                        s = 'wi wi-snow';
+                        s = 'wi-snow';
                         break;
                     case 9:
                     case 10:
-                        s = 'wi wi-day-rain';
+                        s = 'wi-day-rain';
                         break;
                     case 11:
-                        s = 'wi wi-lightning';
+                        s = 'wi-lightning';
                         break;
                     case 12:
-                        s = 'wi wi-sleet';
+                        s = 'wi-sleet';
                         break;
                     case 13:
-                        s = 'wi wi-sleet';
+                        s = 'wi-sleet';
                         break;
                     case 14:
-                        s = 'wi wi-day-alt-snow-thunderstorm';
+                        s = 'wi-day-alt-snow-thunderstorm';
                         break;
                     case 15:
-                        s = 'wi wi-fog';
+                        s = 'wi-fog';
                         break;
                     case 20:
-                        s = 'wi wi-day-alt-snow-thunderstorm';
+                        s = 'wi-day-alt-snow-thunderstorm';
                         break;
                     case 21:
-                        s = 'wi wi-day-alt-snow-thunderstorm';
+                        s = 'wi-day-alt-snow-thunderstorm';
                         break;
                     case 22:
-                        s = 'wi wi-day-alt-snow-thunderstorm';
+                        s = 'wi-day-alt-snow-thunderstorm';
                         break;
                     case 23:
-                        s = 'wi wi-day-alt-snow-thunderstorm';
+                        s = 'wi-day-alt-snow-thunderstorm';
                         break;
                     case 24:
-                        s = 'wi wi-day-sleet-storm';
+                        s = 'wi-day-sleet-storm';
                         break;
                     case 25:
-                        s = 'wi wi-storm-showers';
+                        s = 'wi-storm-showers';
                         break;
                     case 26:
-                        s = 'wi wi-day-alt-snow-thunderstorm';
+                        s = 'wi-day-alt-snow-thunderstorm';
                         break;
                     case 27:
-                        s = 'wi wi-day-alt-snow-thunderstorm';
+                        s = 'wi-day-alt-snow-thunderstorm';
                         break;
                     case 28:
-                        s = 'wi wi-snow';
+                        s = 'wi-snow';
                         break;
                     case 29:
-                        s = 'wi wi-day-alt-snow-thunderstorm';
+                        s = 'wi-day-alt-snow-thunderstorm';
                         break;
                     case 30:
-                        s = 'wi wi-day-sleet-storm';
+                        s = 'wi-day-sleet-storm';
                         break;
                     case 31:
-                        s = 'wi wi-day-sleet-storm';
+                        s = 'wi-day-sleet-storm';
                         break;
                     case 32:
-                        s = 'wi wi-day-thunderstorm';
+                        s = 'wi-day-thunderstorm';
                         break;
                     case 33:
-                        s = 'wi wi-day-alt-snow-thunderstorm';
+                        s = 'wi-day-alt-snow-thunderstorm';
                         break;
                     case 34:
-                        s = 'wi wi-day-snow-thunderstorm';
+                        s = 'wi-day-snow-thunderstorm';
                         break;
                     case 40:
-                        s = 'wi wi-day-showers';
+                        s = 'wi-day-showers';
                         break
                     case 41:
-                        s = 'wi wi-day-rain';
+                        s = 'wi-day-rain';
                         break;
                     case 42:
-                        s = 'wi wi-day-sleet';
+                        s = 'wi-day-sleet';
                         break;
                     case 43:
-                        s = 'wi wi-day-sleet';
+                        s = 'wi-day-sleet';
                         break;
                     case 44:
-                        s = 'wi wi-snow';
+                        s = 'wi-snow';
                         break;
                     case 45:
-                        s = 'wi wi-snowflake-cold';
+                        s = 'wi-snowflake-cold';
                         break;
                     case 46:
-                        s = 'wi wi-raindrop';
+                        s = 'wi-raindrop';
                         break;
                     case 47:
-                        s = 'wi wi-day-sprinkle';
+                        s = 'wi-day-sprinkle';
                         break;
                     case 48:
-                        s = 'wi wi-rain-mix';
+                        s = 'wi-rain-mix';
                         break;
                     case 49:
-                        s = 'wi wi-day-snow';
+                        s = 'wi-day-snow';
                         break;
                     case 50:
-                        s = 'wi wi-snowflake-cold';
+                        s = 'wi-snowflake-cold';
                         break;
                     case 16:
                     case 17:
@@ -191,16 +191,16 @@ function updateForecastDisplay(root, credit_root, responseText) {
                     case 38:
                     case 39:
                     default:
-                        s = 'wi wi-na';
+                        s = 'wi-na';
                         break;
                 }
 
                 temperature_elem.setAttribute('class', 'temperature');
                 temperature_elem.textContent = temperature + '°';
-
                 forecast.appendChild(temperature_elem);
 
-                element.setAttribute('class', s);
+                var icon_style = 'weather-icon wi ' + s;
+                element.setAttribute('class', icon_style);
                 element.setAttribute('title', tool_tip);
                 forecast.appendChild(element);
 
@@ -213,8 +213,6 @@ function updateForecastDisplay(root, credit_root, responseText) {
                 var separator = document.createElement('div');
                 separator.setAttribute('class', 'horizontal-line');
                 forecast.appendChild(separator);
-
-                forecast.setAttribute('class', 'weather-forecast');
 
                 container.appendChild(forecast);
             });
