@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-from pyramid.response import Response
 import sys
 from pyramid.view import view_config, notfound_view_config
 import input_validation
-import zip_place_source
-import weather_source
+from .zip_place_source import lookup_postnummer_closest_to
 import public_transport_source
 from public_transport_source import RuterException
 from .mail_source import MailSource, MsExchangeException
-from .weather_source import YrException
+from .weather_source import lookup_forecast_for_postnummer, YrException
 import datetime
 import traceback
 import logging
@@ -127,7 +125,7 @@ def forecast_static(request):
     else:
         logger.info('%s',fname)
     try:
-        f = weather_source.lookup_forecast_for_postnummer(postnummer)
+        f = lookup_forecast_for_postnummer(postnummer)
     except YrException as e:
         error = str(e)
         logger.error(str(e))
@@ -138,10 +136,10 @@ def forecast_static(request):
 def _lookup_forecasts_for_lat_long(latitude, longitude):
     fname = sys._getframe().f_code.co_name
     logger.debug('%s', fname)
-    zip_places = zip_place_source.lookup_postnummer_closest_to(latitude, longitude)
+    zip_places = lookup_postnummer_closest_to(latitude, longitude)
     forecast = []
     for zp in zip_places:
-        f = weather_source.lookup_forecast_for_postnummer(zp.zip)
+        f = lookup_forecast_for_postnummer(zp.zip)
         forecast.append(f)
     return forecast
 
@@ -157,7 +155,7 @@ def forecast(request):
                 request.response.status = 400
                 return {'error': 'postnummer not accepted', 'params': ['postnummer']}
             else:
-                f = weather_source.lookup_forecast_for_postnummer(postnummer)
+                f = lookup_forecast_for_postnummer(postnummer)
                 return {'error': None, 'forecast': [f]}
         elif 'latitude' in request.GET and 'longitude' in request.GET:
             latitude = request.GET['latitude']

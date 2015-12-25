@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def application_locale_negotiator(request):
     if not hasattr(request, '_LOCALE_'):
         request._LOCALE_ = request.accept_language.best_match(
@@ -26,16 +27,13 @@ def main(global_config, **settings):
     config.add_route('forecast:static', '/forecast/static')
     config.add_route('mail:calendar', '/mail/calendar')
 
+    config.add_route('time:now', '/time/now')
+    config.add_route('forecast:now', '/forecast/now')
+    config.add_route('forecast:now:keys', '/forecast/now/keys')
+
     config.scan()
     app = config.make_wsgi_app()
     logger.debug('Returning WGSI app' + str(app))
     return app
 
 #__here__ = os.path.dirname(os.path.abspath(__file__))
-
-#def make_app():
-#    """ This functions returns a parameterless Pyramid WSGI applicaiton.
-#    """
-#    return main(None)
-
-#app = make_app()

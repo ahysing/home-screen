@@ -25,7 +25,6 @@
         </span>
       </div>
     </div>
-    </script>
     <script src="${request.static_url('homescreen:static/clock.js')}" defer='defer'></script>
     <script src="${request.static_url('homescreen:static/forecast.js')}" defer='defer'></script>
     <link href="${request.static_url('homescreen:static/w/css/weather-icons.min.css')}" type="text/css" rel="stylesheet">
