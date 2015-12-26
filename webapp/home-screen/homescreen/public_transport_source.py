@@ -69,13 +69,12 @@ def _parse_json_departures(raw):
             d.published_line_name = monitored_vehicle_journey['PublishedLineName']
             d.direction_name = monitored_vehicle_journey['DirectionName']
             d.destination_name = monitored_vehicle_journey['DestinationName']
-            d.destination_aimed_arrival_time = monitored_vehicle_journey['DestinationAimedArrivalTime']
-            d.original_aimed_departure_time = monitored_vehicle_journey['OriginAimedDepartureTime']
             d.delay = monitored_vehicle_journey['Delay']
 
             monitor_call = monitored_vehicle_journey['MonitoredCall']
-            d.destination_aimed_arrival_time = monitor_call['AimedArrivalTime']
             d.destination_display = monitor_call['DestinationDisplay']
+            d.aimed_departure_time = monitor_call['AimedDepartureTime']
+            d.expected_departure_time = monitor_call['ExpectedDepartureTime']
             departures.append(d)
         except KeyError as e:
             logger.error(str(e))

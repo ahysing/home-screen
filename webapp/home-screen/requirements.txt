@@ -15,3 +15,5 @@ requests_ntlm
 utm==0.4.0
 waitress==0.8.10
 setuptools==19.1.1 # transitive dependancy for pyramid
+python-dateutil
+pytz

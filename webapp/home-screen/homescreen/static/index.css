@@ -14,9 +14,11 @@ h6 {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 300;
 }
+@media (min-height: 736px) {
+  .clock { font-size: 500%; }
+}
 .clock {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 500%;
   font-weight: bold;
 }
 .forecast {
@@ -87,8 +89,15 @@ iframe {
   overflow: hidden;
   height: 1024px;
   width: 100%;
+  border: 0px;
 }
 .fill-screen {
   font-size: 64px;
   font-size: 40vw;
+}
+.delay {
+  color: #EE8888;
+}
+*[id^='col-md-'] {
+  display: inline;
 }

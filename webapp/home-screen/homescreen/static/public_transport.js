@@ -4,6 +4,10 @@
     longitude, onreadystatechange, open, readyState, replace, responseText,
     send, status
 */
+var DELAY_TEXT = 'Forsinkelse ';
+var HOURS_TEXT = 'timer';
+var MINUTES_TEXT = 'minutter';
+var SECONDS_TEXT = 'sekunder';
 var ALT_ICN = 'Transportmiddel for avreise';
 var TRANSPORT_LIMIT =  '10';
 var TRANSPORT_POLL_DELAY = 3600000;
@@ -52,6 +56,7 @@ function updateTransportDisplay(elem, text) {
                     var icon = document.createElement('img');
                     var display_txt = document.createElement('span');
                     var time_txt = document.createElement('time');
+                    var delay_txt = document.createElement('span');
                     var h_line = document.createElement('div');
 
                     var mode = x['vehicle_mode'];
@@ -80,9 +85,25 @@ function updateTransportDisplay(elem, text) {
                     var destination_name = x['destination_name'];
                     display_txt.textContent = x ['line_ref'] + ' ' + destination_name;
                     display_txt.setAttribute('class', 'transport-name');
-                    var dt = x['destination_aimed_arrival_time'];
+                    var cls = 'transport-time';
+                    var dt = x['expected_departure_time'];
+                    var dt_original = x['aimed_departure_time'];
+                    if (dt_original !== dt) {
+                        cls += ' delay';
+                        var diff_ms = Date.parse(dt) - Date.parse(dt_original);
+                        var diff_s = floor(diff_ms / 1000);
+                        var diff_m = floor((diff_ms - diff_s * 1000) / 60000);
+                        var diff_h = floor((diff_ms - diff_s * 1000 - diff_m * 60000) / 3600000);
+                        var delay_tt = DELAY_TEXT + ' ';
+                        if (diff_h) delay_tt += diff_h + ' ' + HOURS_TEXT +' ';
+                        if (diff_m) delay_tt += diff_m + ' ' + MINUTES_TEXT + ' ';
+                        if (diff_s) delay_tt += diff_s + ' ' + SECONDS_TEXT + ' ';
+                        delay_txt.textContent = delay_tt;
+                        delay_txt.setAttribute('class', 'delay');
+                    }
+
                     var time_pp = iso8601_to_time_hm(dt);
-                    time_txt.setAttribute('class', 'transport-time');
+                    time_txt.setAttribute('class', cls);
                     time_txt.setAttribute('datetime', dt);
                     time_txt.textContent = time_pp;
 
@@ -90,6 +111,7 @@ function updateTransportDisplay(elem, text) {
                     route.appendChild(icon);
                     route.appendChild(display_txt);
                     route.appendChild(time_txt);
+                    route.appendChild(delay_txt);
                     route.appendChild(h_line);
                     container.appendChild(route);
                 });

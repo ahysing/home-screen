@@ -10,24 +10,26 @@
     <!-- Bootstrap core CSS -->
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="${request.static_url('homescreen:static/index.css')}" rel="stylesheet">
+    <link href="${request.static_url('homescreen:static/w/css/weather-icons.min.css')}" type="text/css" rel="stylesheet">
+    <link href="${request.static_url('homescreen:static/w/css/weather-icons-wind.min.css')}" type="text/css" rel="stylesheet">
   </head>
   <body>
     <div class="container">
       <div class="row">
-        <span class="col-md-12">
+        <div class="col-md-12">
           <section class="clock" accesskey="c C k K">
           </section>
-        </span>
+        </div>
       </div>
       <div class="row">
-        <span class="col-md-6">
+        <div class="col-md-6">
           <section class="transport">
             <noscript>
               <iframe scrolling="no" src="${request.route_url('transport:next:static')}"></iframe>
             </noscript>
           </section>
-        </span>
-        <span class="col-md-5">
+        </div>
+        <div class="col-md-5">
           <section class="forecast">
             <noscript>
               <iframe scrolling="no" align="right" src="${request.route_url('forecast:static')}"></iframe>
@@ -36,13 +38,11 @@
               <small class="forecast-credits"></small>
             </footer>
           </section>
-        </span>
+        </div>
       </div>
     </div>
     <script src="${request.static_url('homescreen:static/clock.js')}" defer='defer'></script>
     <script src="${request.static_url('homescreen:static/forecast.js')}" defer='defer'></script>
-    <link href="${request.static_url('homescreen:static/w/css/weather-icons.min.css')}" type="text/css" rel="stylesheet">
-    <link href="${request.static_url('homescreen:static/w/css/weather-icons-wind.min.css')}" type="text/css" rel="stylesheet">
     <script src="${request.static_url('homescreen:static/public_transport.js')}" defer='defer'></script>
     <script src="${request.static_url('homescreen:static/mail_exchange.js')}" defer='defer'></script>
     <!-- Bootstrap core JavaScript ================================================== -->

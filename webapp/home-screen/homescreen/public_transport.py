@@ -37,8 +37,8 @@ class Departure(object):
         self.destination_display = None
         self.destination_name = None
         self.destination_platform_name = None
-        self.original_aimed_departure_time = None
-        self.destination_aimed_arrival_time = None
+        self.aimed_departure_time = None
+        self.expected_departure_time = None
         self.delay = None
         self.vehicle_mode = None
         self.published_line_name = None
@@ -48,5 +48,6 @@ class Departure(object):
                 'published_line_name': self.published_line_name, 'direction': self.direction,
                 'direction_name':self.direction_name,
                 'destination_display': self.destination_display, 'destination_name':self.destination_name,
-                'delay':self.delay, 'original_aimed_departure_time':self.original_aimed_departure_time,
-                'destination_aimed_arrival_time':self.destination_aimed_arrival_time}
+                'delay':self.delay, 'aimed_departure_time':self.aimed_departure_time,
+                'expected_departure_time':self.expected_departure_time
+                }

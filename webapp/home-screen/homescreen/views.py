@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
+import dateutil.parser
+import pytz
+from webutils import http_date
 from pyramid.view import view_config, notfound_view_config
 import input_validation
 from .zip_place_source import lookup_postnummer_closest_to
@@ -13,14 +16,17 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @notfound_view_config(renderer = 'templates/not_found.pt')
 def not_found(request):
     request.response.status = 404
     return {}
 
-@view_config(context=Exception, renderer = 'templates/internal_server_error.pt')
-def internal_server_error(request):
-    return {}
+
+#@view_config(context=Exception, renderer = 'templates/internal_server_error.pt')
+#def internal_server_error(request):
+#    return {}
+
 
 def build_error_latlong(latitude, longitude):
     return 'location not accepted latitude={0} longitude={1}'.format(latitude, longitude)
@@ -39,8 +45,13 @@ def transport_next_static(request):
     longitude = u'10.4510'        # Longitude and latitude for the center of Oslo
     stop_name = 'Oslo S'
     transport = None
-    updated = '2015-01-01T00:00:00Z'
-    updated_txt = 'Sist oppdatert'
+    updated = datetime.datetime.utcnow()
+    from_zone = pytz.utc
+    to_zone = pytz.timezone('Europe/Oslo')
+    updated = updated.replace(tzinfo=from_zone)
+    updated = updated.astimezone(to_zone)
+    updated_txt = updated.strftime('%H:%M')
+    updated_label = 'Sist oppdatert kl '
 
     if 'latitude' in request.GET and 'longitude' in request.GET:
         latitude = request.GET['latitude']
@@ -53,7 +64,7 @@ def transport_next_static(request):
         error = str(e)
         logger.error(str(e))
     return {'from':from_dt, 'from_time':from_time, 'alt_departure_type': alt_departure_type,
-            'updated_txt': updated_txt, 'updated':updated, 'stop_name':stop_name,
+            'updated_label': updated_label, 'updated_txt':updated_txt, 'stop_name':stop_name,
             'transport': transport, 'error':error}
 
 
@@ -115,7 +126,7 @@ def forecast_static(request):
     temperature = '0'
     to_dt = '2015-01-01T00:00:00Z'
     to_time = '00:00'
-    weather_h1 = 'Været for Oslo'
+    weather_h1 = ''
     if 'postnummer' in request.GET:
         postnummer = request.GET['postnummer']
         logger.info('%s postnummer=%s',fname, postnummer)
@@ -124,12 +135,15 @@ def forecast_static(request):
             return {'error': 'postnummer not accepted', 'params': ['postnummer']}
     else:
         logger.info('%s',fname)
+
     try:
-        f = lookup_forecast_for_postnummer(postnummer)
+        first_forecast = lookup_forecast_for_postnummer(postnummer)
+        bind_headers_for_forecast(request, first_forecast)
+        weather_h1 = first_forecast.place.name
     except YrException as e:
         error = str(e)
         logger.error(str(e))
-    return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'forecast':[f], 'from':from_dt,
+    return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'forecast':[first_forecast], 'from':from_dt,
             'to':to_dt, 'from_time': from_time, 'to_time': to_time, 'weather_h1': weather_h1, 'error': error}
 
 
@@ -144,6 +158,14 @@ def _lookup_forecasts_for_lat_long(latitude, longitude):
     return forecast
 
 
+def bind_headers_for_forecast(request, forecast):
+    last_date = forecast.time_forecasts[-1].to
+    last_date_dt = dateutil.parser.parse(last_date)
+    zip = forecast.place.zip
+    request.response.expires = http_date(last_date_dt)
+    request.response.etag = 'forecast;{};{}'.format(zip, last_date_dt)
+
+
 @view_config(route_name='forecast', renderer='json')
 def forecast(request):
     fname = sys._getframe().f_code.co_name
@@ -155,8 +177,9 @@ def forecast(request):
                 request.response.status = 400
                 return {'error': 'postnummer not accepted', 'params': ['postnummer']}
             else:
-                f = lookup_forecast_for_postnummer(postnummer)
-                return {'error': None, 'forecast': [f]}
+                first_forecast = lookup_forecast_for_postnummer(postnummer)
+                bind_headers_for_forecast(request, first_forecast)
+                return {'error': None, 'forecast': [first_forecast]}
         elif 'latitude' in request.GET and 'longitude' in request.GET:
             latitude = request.GET['latitude']
             longitude = request.GET['longitude']
@@ -166,6 +189,9 @@ def forecast(request):
                 return {'error': build_error_latlong(latitude, longitude), 'params': ['latitude', 'longitude']}
             else:
                 forecast = _lookup_forecasts_for_lat_long(latitude, longitude)
+                first_forecast = forecast[0]
+                bind_headers_for_forecast(request, first_forecast)
+
                 return {'error': None, 'forecast': forecast}
         elif len(request.params) > 0:
             logger.info('%s invalid parameters',fname)

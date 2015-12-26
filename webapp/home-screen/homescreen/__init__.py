@@ -27,7 +27,7 @@ def main(global_config, **settings):
     config.add_route('forecast:static', '/forecast/static')
     config.add_route('mail:calendar', '/mail/calendar')
 
-    config.add_route('time:now', '/time/now')
+    config.add_route('datetime:now', '/datetime/now')
     config.add_route('forecast:now', '/forecast/now')
     config.add_route('forecast:now:keys', '/forecast/now/keys')
 

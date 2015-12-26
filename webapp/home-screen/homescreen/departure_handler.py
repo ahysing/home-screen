@@ -17,12 +17,13 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         self.in_expected_departure_time = False
         self.in_destination_display = False
         self.in_vehicle_mode = False
-        self.in_destination_aimed_arrival_time = False
+        self.in_aimed_departure_time = False
+        self.in_expected_arrival_time = False
         self.in_direction_name = False
         self.in_direction_ref = False
-        self.in_original_aimed_departure_time = False
+        self.in_aimed_departure_time = False
 
-        self.original_aimed_departure_time = None
+        self.aimed_departure_time = None
         self.destination_aimed_arrival_time = None
         self.expected_departure_time = None
         self.destination_name = None
@@ -36,7 +37,7 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         self.departures = []
 
     def set_fields_none(self):
-        self.original_aimed_departure_time = None
+        self.aimed_departure_time = None
         self.destination_aimed_arrival_time = None
         self.expected_departure_time = None
         self.destination_name = None
@@ -55,8 +56,8 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
             self.expected_departure_time = content
         elif self.in_destination_platform_name:
             self.destination_platform_name = content
-        elif self.in_original_aimed_departure_time:
-            self.original_aimed_departure_time = content
+        elif self.in_aimed_departure_time:
+            self.aimed_departure_time = content
         elif self.in_destination_aimed_arrival_time:
             self.destination_aimed_arrival_time = content
         elif self.in_destination_display:
@@ -83,10 +84,8 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
                     self.in_delay = True
                 elif name == 'DestinationName':
                     self.in_destination_name = True
-                elif name == 'OriginAimedDepartureTime':
-                    self.in_original_aimed_departure_time = True
-                elif name == 'DestinationAimedArrivalTime':
-                    self.in_destination_aimed_arrival_time = True
+                elif name == 'AimedDepartureTime':
+                    self.in_aimed_departure_time = True
                 elif name == 'DirectionName':
                     self.in_direction_name = True
                 elif name == 'DirectionRef':
@@ -106,6 +105,7 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         d.destination_name = self.destination_name
         d.destination_aimed_arrival_time = self.destination_aimed_arrival_time
         d.expected_departure_time = self.expected_departure_time
+        d.aimed_departure_time = self.aimed_departure_time
         d.destination_display = self.destination_display
         d.destination_platform_name = self.destination_platform_name
         d.direction_name = self.direction_name
@@ -140,5 +140,7 @@ class DepartureHandler(xml.sax.handler.ContentHandler):
         elif name == 'VehicleMode':
             self.in_vehicle_mode = False
         elif name == 'OriginalAimedArrivalTime':
-            self.in_original_aimed_departure_time = False
+            self.in_aimed_departure_time = False
+        elif name == 'AimedDepartureTime':
+            self.in_aimed_departure_time = False
 

@@ -16,9 +16,10 @@ class WeatherResponse(object):
 class Place(object):
     def __init__(self):
         self.name = None
+        self.zip = None
 
     def __json__(self, request):
-        return {'name': self.name}
+        return {'name': self.name, 'zip':self.zip}
 
 
 class Credit(object):
