@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
 import dateutil.parser
-import pytz
+
+from time_utils import TimeUtils
 from webutils import http_date
 from pyramid.view import view_config, notfound_view_config
 import input_validation
@@ -15,6 +16,7 @@ import traceback
 import logging
 
 logger = logging.getLogger(__name__)
+TIME_ZONE = 'Europe/Oslo'
 
 
 @notfound_view_config(renderer = 'templates/not_found.pt')
@@ -46,10 +48,7 @@ def transport_next_static(request):
     stop_name = 'Oslo S'
     transport = None
     updated = datetime.datetime.utcnow()
-    from_zone = pytz.utc
-    to_zone = pytz.timezone('Europe/Oslo')
-    updated = updated.replace(tzinfo=from_zone)
-    updated = updated.astimezone(to_zone)
+    updated = TimeUtils().shift_to_timezone(updated, TIME_ZONE)
     updated_txt = updated.strftime('%H:%M')
     updated_label = 'Sist oppdatert kl '
 

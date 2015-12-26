@@ -7,9 +7,10 @@ from .weather_source import lookup_forecast_for_postnummer
 from .webutils import http_date
 from pyramid.view import view_config, notfound_view_config
 import logging
-import hashlib
+from time_utils import TimeUtils
 
 logger = logging.getLogger(__name__)
+TIME_ZONE = 'Europe/Oslo'
 
 
 def _filter_forecast_fields(forecasts, request_keys):
@@ -78,6 +79,7 @@ def datetime_now(request):
     fname = sys._getframe().f_code.co_name
     logger.info('%s', fname)
     dt = datetime.datetime.now()
+    dt = TimeUtils().shift_to_timezone(dt, TIME_ZONE)
     time_s = dt.isoformat()
     request.response.headers['Cache-Control'] = 'no-cache'
     request.response.expires = http_date(dt)
