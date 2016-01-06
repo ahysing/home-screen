@@ -103,6 +103,7 @@ function updateTransportDisplay(elem, text) {
                         if (diff_s) delay_tt += diff_s_rem + ' ' + SECONDS_TEXT + ' ';
                         delay_txt.textContent = delay_tt;
                         delay_txt.setAttribute('class', 'delay');
+                        delay_txt.dataset.delayMs = diff_ms;
                     }
 
                     var time_pp = iso8601_to_time_hm(dt);
