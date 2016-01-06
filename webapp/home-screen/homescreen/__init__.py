@@ -1,6 +1,6 @@
 from pyramid.config import Configurator
 import logging
-
+from .tracked_request import TrackedRequest
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,9 @@ def main(global_config, **settings):
     config.add_route('datetime:now', '/datetime/now')
     config.add_route('forecast:now', '/forecast/now')
     config.add_route('forecast:now:keys', '/forecast/now/keys')
+
+    config.set_request_factory(TrackedRequest)
+    config._add_tween('homescreen.tweens.log_tracker.LogTracker')
 
     config.scan()
     app = config.make_wsgi_app()

@@ -87,9 +87,14 @@ input.authenticate{
 }
 iframe {
   overflow: hidden;
-  height: 1024px;
   width: 100%;
   border: 0px;
+}
+.forecast * iframe {
+  height: 445px;
+}
+.transport * iframe {
+  height: 778px;
 }
 .fill-screen {
   font-size: 64px;

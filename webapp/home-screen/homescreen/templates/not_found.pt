@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="${request.static_url('homescreen:static/today-xxl.png')}">
     <title>Feil adresse</title>
     <!-- Bootstrap core CSS -->
-    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link href="${request.static_url('homescreen:static/index.css')}" rel="stylesheet">
     <link href="${request.static_url('homescreen:static/w/css/weather-icons.min.css')}" type="text/css" rel="stylesheet">
     <link href="${request.static_url('homescreen:static/w/css/weather-icons-wind.min.css')}" type="text/css" rel="stylesheet">
@@ -27,12 +27,11 @@
         </div>
       </div>
     </div>
-    <script src="${request.static_url('homescreen:static/clock.js')}" defer='defer'></script>
-    <script src="${request.static_url('homescreen:static/forecast.js')}" defer='defer'></script>
-    <script src="${request.static_url('homescreen:static/public_transport.js')}" defer='defer'></script>
-    <script src="${request.static_url('homescreen:static/mail_exchange.js')}" defer='defer'></script>
+    <script src="${request.static_url('homescreen:static/clock.min.js')}" defer='defer'></script>
+    <script src="${request.static_url('homescreen:static/forecast.min.js')}" defer='defer'></script>
+    <script src="${request.static_url('homescreen:static/public_transport.min.js')}" defer='defer'></script>
+    <script src="${request.static_url('homescreen:static/mail_exchange.min.js')}" defer='defer'></script>
     <!-- Bootstrap core JavaScript ================================================== -->
-    <script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
   </body>
 </html>

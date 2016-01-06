@@ -14,12 +14,12 @@ class YrException(Exception):
 
 
 def _parse_forecast(raw):
-    sax_xmlreader = xml.sax.make_parser()
+    sax_xml_parser = xml.sax.make_parser()
     stream = cStringIO.StringIO(raw)
     try:
         weather_handler = WeatherHandler()
-        sax_xmlreader.setContentHandler(weather_handler)
-        sax_xmlreader.parse(stream)
+        sax_xml_parser.setContentHandler(weather_handler)
+        sax_xml_parser.parse(stream)
         stream.close()
         wr = WeatherResponse()
         wr.credit = weather_handler.credit
@@ -37,6 +37,7 @@ def lookup_forecast_for_postnummer(postnummer):
     if status_code == 200:
         return _parse_forecast(response_body)
     else:
+        logger.warning('Failed to get forecast for %s. HTTP Response code', postnummer, status_code)
         wr = WeatherResponse()
         wr.credit = Credit()
         wr.place = Place()

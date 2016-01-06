@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
 import dateutil.parser
-
 from time_utils import TimeUtils
 from webutils import http_date
 from pyramid.view import view_config, notfound_view_config
@@ -38,14 +37,12 @@ def build_error_latlong(latitude, longitude):
 def transport_next_static(request):
     fname = sys._getframe().f_code.co_name
     alt_departure_type = 'Transportmiddel for avreise'
-
-    error = None
     from_dt = '2015-01-01T00:00:00Z'
     from_time = '00:00'
-    latitude = u'59.5440'         # Longitude and latitude for the center of Oslo
+    latitude = u'59.892501'
     limit, error = _parse_limit_or_error(request)
-    longitude = u'10.4510'        # Longitude and latitude for the center of Oslo
-    stop_name = 'Oslo S'
+    longitude = u'10.619216'
+    stop_name = 'Fornebu Vest'
     transport = None
     updated = datetime.datetime.utcnow()
     updated = TimeUtils().shift_to_timezone(updated, TIME_ZONE)
@@ -83,7 +80,6 @@ def _parse_limit_or_error(request):
 @view_config(route_name='transport:next', renderer='json')
 def transport_next(request):
     fname = sys._getframe().f_code.co_name
-    error = None
     try:
         if 'latitude' in request.GET and 'longitude' in request.GET:
             latitude = request.GET['latitude']
@@ -117,33 +113,29 @@ def forecast_static(request):
     fname = sys._getframe().f_code.co_name
     dt_separator = 'til'
     error = None
-    forecast = None
-    from_dt = '2015-01-01T00:00:00Z'
-    from_time = '00:00'
-    icon = 'wi'
-    postnummer = '0250' # Aker Brygge per november 2015
+    postnummer = '1364'
     temperature = '0'
-    to_dt = '2015-01-01T00:00:00Z'
-    to_time = '00:00'
-    weather_h1 = ''
+
     if 'postnummer' in request.GET:
         postnummer = request.GET['postnummer']
         logger.info('%s postnummer=%s',fname, postnummer)
         if not input_validation.is_valid_postnummer(postnummer):
             request.response.status = 400
             return {'error': 'postnummer not accepted', 'params': ['postnummer']}
-    else:
-        logger.info('%s',fname)
 
     try:
         first_forecast = lookup_forecast_for_postnummer(postnummer)
         bind_headers_for_forecast(request, first_forecast)
         weather_h1 = first_forecast.place.name
+        forecast = [first_forecast]
     except YrException as e:
         error = str(e)
         logger.error(str(e))
-    return {'icon': icon, 'temperature': temperature, 'dt_separator': dt_separator, 'forecast':[first_forecast], 'from':from_dt,
-            'to':to_dt, 'from_time': from_time, 'to_time': to_time, 'weather_h1': weather_h1, 'error': error}
+    else:
+        logger.info('%s',fname)
+
+    return {'temperature': temperature, 'dt_separator': dt_separator, 'forecast':forecast, 'weather_h1': weather_h1,
+            'error': error}
 
 
 def _lookup_forecasts_for_lat_long(latitude, longitude):
@@ -152,17 +144,28 @@ def _lookup_forecasts_for_lat_long(latitude, longitude):
     zip_places = lookup_postnummer_closest_to(latitude, longitude)
     forecast = []
     for zp in zip_places:
+        logger.debug('Lookup forecast for %s', zp.zip)
         f = lookup_forecast_for_postnummer(zp.zip)
         forecast.append(f)
+    for f in forecast:
+        try:
+            logger.debug('Returning forecast for %s', f.place.name)
+        except:
+            pass
     return forecast
 
 
 def bind_headers_for_forecast(request, forecast):
+    logger.debug('Building headers ETag and Expires')
     last_date = forecast.time_forecasts[-1].to
     last_date_dt = dateutil.parser.parse(last_date)
     zip = forecast.place.zip
-    request.response.expires = http_date(last_date_dt)
-    request.response.etag = 'forecast;{};{}'.format(zip, last_date_dt)
+    expires = http_date(last_date_dt)
+    logger.debug('Expires %s', expires)
+    request.response.expires = expires
+    etag = 'forecast;{};{}'.format(zip, last_date_dt)
+    request.response.etag = etag
+    logger.debug('ETag %s', etag)
 
 
 @view_config(route_name='forecast', renderer='json')
@@ -187,11 +190,11 @@ def forecast(request):
                 request.response.status = 400
                 return {'error': build_error_latlong(latitude, longitude), 'params': ['latitude', 'longitude']}
             else:
-                forecast = _lookup_forecasts_for_lat_long(latitude, longitude)
-                first_forecast = forecast[0]
+                forecast_latlong = _lookup_forecasts_for_lat_long(latitude, longitude)
+                first_forecast = forecast_latlong[0]
                 bind_headers_for_forecast(request, first_forecast)
 
-                return {'error': None, 'forecast': forecast}
+                return {'error': None, 'forecast': forecast_latlong}
         elif len(request.params) > 0:
             logger.info('%s invalid parameters',fname)
             request.response.status = 400
@@ -269,19 +272,3 @@ def index_authenticate(request):
         message = str(e)
         request.response.status = 500
         return {'error': message, 'params': ['username', 'password'], 'calendar': None, 'show_authenticate': 'active-form'}
-
-conn_err_msg = """\
-Pyramid is having a problem using your SQL database.  The problem
-might be caused by one of the following things:
-
-1.  You may need to run the "initialize_home-screen_db" script
-    to initialize your database tables.  Check your virtual
-    environment's "bin" directory for this script and try to run it.
-
-2.  Your database server may not be running.  Check that the
-    database server referred to by the "sqlalchemy.url" setting in
-    your "development.ini" file is running.
-
-After you fix the problem, please restart the Pyramid application to
-try it again.
-"""

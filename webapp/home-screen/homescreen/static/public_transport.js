@@ -91,13 +91,16 @@ function updateTransportDisplay(elem, text) {
                     if (dt_original !== dt) {
                         cls += ' delay';
                         var diff_ms = Date.parse(dt) - Date.parse(dt_original);
-                        var diff_s = floor(diff_ms / 1000);
-                        var diff_m = floor((diff_ms - diff_s * 1000) / 60000);
-                        var diff_h = floor((diff_ms - diff_s * 1000 - diff_m * 60000) / 3600000);
+                        var diff_s = Math.floor(diff_ms / 1000);
+                        var diff_s_rem = diff_s % 60;
+                        var diff_m = Math.floor((diff_s - diff_s_rem) / 60);
+                        var diff_m_rem = diff_m % 60
+                        var diff_h = Math.floor((diff_m - diff_m_rem) / 60);
+                        var diff_h_rem = diff_h % 24;
                         var delay_tt = DELAY_TEXT + ' ';
-                        if (diff_h) delay_tt += diff_h + ' ' + HOURS_TEXT +' ';
-                        if (diff_m) delay_tt += diff_m + ' ' + MINUTES_TEXT + ' ';
-                        if (diff_s) delay_tt += diff_s + ' ' + SECONDS_TEXT + ' ';
+                        if (diff_h) delay_tt += diff_h_rem + ' ' + HOURS_TEXT +' ';
+                        if (diff_m) delay_tt += diff_m_rem + ' ' + MINUTES_TEXT + ' ';
+                        if (diff_s) delay_tt += diff_s_rem + ' ' + SECONDS_TEXT + ' ';
                         delay_txt.textContent = delay_tt;
                         delay_txt.setAttribute('class', 'delay');
                     }

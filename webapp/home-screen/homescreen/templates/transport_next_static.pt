@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="${request.locale_name}" xmlns:tal="http://xml.zope.org/namespaces/tal" xmlns:metal="http://xml.zope.org/namespaces/metal">
+<html lang="${request.locale_name}" xmlns:tal="http://xml.zope.org/namespaces/tal">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,12 +7,12 @@
     <meta name="description" content="Personlig oversikt over kalender, vær og offentlig transport der du er nå">
     <link rel="shortcut icon" href="${request.static_url('homescreen:static/today-xxl.png')}">
     <title>${transport.stop.name}</title>
-    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link href="${request.static_url('homescreen:static/index.css')}" rel="stylesheet">
   </head>
   <body>
     <div class="container">
-      <section>
+      <section class="transport">
         <hgroup>
           <h1>${transport.stop.name}</h1>
           <p>${updated_label}${updated_txt}</p>

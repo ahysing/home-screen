@@ -3,7 +3,7 @@ import google
 import logging
 import homescreen
 """
-This module works as a bootstrapr for Google App Engine.
+This module works as a bootstraper for Google App Engine.
 """
 
 
