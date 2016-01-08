@@ -27,6 +27,7 @@
             <noscript>
               <iframe scrolling="no" src="${request.route_url('transport:next:static')}"></iframe>
             </noscript>
+            <div id="no-departures" class="no-departures" hidden>Det finnes ingen avganger i nær framtid</div>
           </section>
         </div>
         <div class="col-md-5">

@@ -2,9 +2,10 @@
     addEventListener, coords, element, geolocation, getCurrentPosition,
     getElementsByClassName, textContent, latitude, length, location, log,
     longitude, onreadystatechange, open, readyState, replace, responseText,
-    send, status
+    send, status,
+    element, beg_id
 */
-var DELAY_TEXT = 'Forsinkelse ';
+var DELAY_TEXT = 'Avvik fra tabell ';
 var HOURS_TEXT = 'timer';
 var MINUTES_TEXT = 'minutter';
 var SECONDS_TEXT = 'sekunder';
@@ -14,26 +15,45 @@ var TRANSPORT_POLL_DELAY = 3600000;
 var TRANSPORT_RETRY_DELAY = 6000;
 
 var pt_object = {
+    'beg_id': -1,
     'element': undefined
 };
-function begForLocation(callback, error_callback) {
+function fallbackLocationIgnorantBrowser() {
     'use strict';
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(callback, error_callback);
-    } else {
-        error_callback();
+    var CLS = '.transport';
+    var noscript = document.querySelector(CLS + ' > noscript');
+    if (noscript) {
+        var statics = document.createElement('div');
+        statics.innerHTML = noscript.innerText;
+        var f = document.querySelector(CLS);
+        f.replaceChild(statics, noscript);
     }
 }
-
-function deniedLocation() {
-    console.error('location denied for public transports!');
-    setTimeout(startPollingTransport, TRANSPORT_RETRY_DELAY);
+function begForLocation(callback, error_callback) {
+    'use strict';
+    if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(callback, error_callback);
+    } else {
+        fallbackLocationIgnorantBrowser();
+    }
 }
-
+function deniedLocation(position_error) {
+    'use strict';
+    console.error('location denied for public transports!');
+    stopPollingTransport();
+    setTimeout(userRequestTransport, TRANSPORT_RETRY_DELAY);
+}
 function iso8601_to_time_hm(time_pp) {
     'use strict';
     var time_start = time_pp.indexOf('T');
     return time_pp.slice(time_start+1, time_start+6);
+}
+function bindByIdToElem(id, elem) {
+    'use strict';
+    var empty_txt = document.getElementById(id).cloneNode(true);
+    empty_txt.removeAttribute('id');
+    empty_txt.removeAttribute('hidden');
+    elem.appendChild(empty_txt);
 }
 function updateTransportDisplay(elem, text) {
     'use strict';
@@ -41,15 +61,15 @@ function updateTransportDisplay(elem, text) {
         var obj = JSON.parse(text);
         if (obj) {
             var container = document.createElement('div');
-            var transports = obj['transport'];
-            var d = undefined;
+            var transports = obj.transport;
+            var d;
             if (transports) {
-                d = transports['departures'];
+                d = transports.departures;
             }
 
             if (Array.isArray(d)) {
-                var stop_text = document.createElement('h1')
-                stop_text.textContent = transports['stop']['name'];
+                var stop_text = document.createElement('h1');
+                stop_text.textContent = transports.stop.name;
                 container.appendChild(stop_text);
                 d.forEach(function(x) {
                     var route = document.createElement('article');
@@ -59,7 +79,7 @@ function updateTransportDisplay(elem, text) {
                     var delay_txt = document.createElement('span');
                     var h_line = document.createElement('div');
 
-                    var mode = x['vehicle_mode'];
+                    var mode = x.vehicle_mode;
                     var icon_link = '';
                     var port_pre = '//' + window.document.location.host;
                     switch(mode) {
@@ -82,19 +102,19 @@ function updateTransportDisplay(elem, text) {
                     icon.setAttribute('src', icon_link);
                     icon.setAttribute('alt', ALT_ICN);
 
-                    var destination_name = x['destination_name'];
-                    display_txt.textContent = x ['line_ref'] + ' ' + destination_name;
+                    var destination_name = x.destination_name;
+                    display_txt.textContent = x.line_ref + ' ' + destination_name;
                     display_txt.setAttribute('class', 'transport-name');
                     var cls = 'transport-time';
-                    var dt = x['expected_departure_time'];
-                    var dt_original = x['aimed_departure_time'];
+                    var dt = x.expected_departure_time;
+                    var dt_original = x.aimed_departure_time;
                     if (dt_original !== dt) {
                         cls += ' delay';
                         var diff_ms = Date.parse(dt) - Date.parse(dt_original);
                         var diff_s = Math.floor(diff_ms / 1000);
                         var diff_s_rem = diff_s % 60;
                         var diff_m = Math.floor((diff_s - diff_s_rem) / 60);
-                        var diff_m_rem = diff_m % 60
+                        var diff_m_rem = diff_m % 60;
                         var diff_h = Math.floor((diff_m - diff_m_rem) / 60);
                         var diff_h_rem = diff_h % 24;
                         var delay_tt = DELAY_TEXT + ' ';
@@ -119,6 +139,9 @@ function updateTransportDisplay(elem, text) {
                     route.appendChild(h_line);
                     container.appendChild(route);
                 });
+                if (d.length === 0) {
+                    bindByIdToElem('no-departures', container);
+                }
             } else {
                 console.error('No transports are available.');
             }
@@ -132,7 +155,6 @@ function requestTransportForLocation(e) {
     'use strict';
     var xhr = new XMLHttpRequest();
     function handleTransport() {
-        'use strict';
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
                 updateTransportDisplay(pt_object.element, xhr.responseText);
@@ -150,9 +172,17 @@ function requestTransportForLocation(e) {
     xhr.onreadystatechange = handleTransport;
     xhr.send();
 }
-function startPollingTransport() {
+function userRequestTransport() {
     'use strict';
     begForLocation(requestTransportForLocation, deniedLocation);
+}
+function startPollingTransport() {
+    'use strict';
+    pt_object.beg_id = setInterval(userRequestTransport, TRANSPORT_POLL_DELAY);
+}
+function stopPollingTransport() {
+    'use strict';
+    clearInterval(pt_object.beg_id);
 }
 function setupTransport() {
     'use strict';
@@ -160,8 +190,8 @@ function setupTransport() {
     if (transport.length > 0) {
         var t = transport[0];
         pt_object.element = t;
+        userRequestTransport();
         startPollingTransport();
-        setInterval(startPollingTransport, TRANSPORT_POLL_DELAY);
     }
 }
 

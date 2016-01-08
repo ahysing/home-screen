@@ -19,8 +19,8 @@
         <div class="col-md-12">
           <section class="message" accesskey="i">
             <hgroup>
-              <h1>Denne ressursern kjenner vi ikke</h1>
-              <h2>Verifiser webadressen eller kontakt kilden for å tilsendt en ny en</h2>
+              <h1>Denne siden kjenner vi ikke</h1>
+              <h2>Verifiser vebbadressen eller kontakt opphavspersonen for få en ny nettside.</h2>
             </hgroup>
             <img src="${request.static_url('homescreen:static/icon/not_found.png')}" alt="We are looking for your page">
           </section>

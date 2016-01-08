@@ -37,6 +37,7 @@
                 tal:condition="it.expected_departure_time != it.aimed_departure_time">Orginal avgang ${it.aimed_departure_time}</span>
           <div class="horizontal-line"></div>
         </article>
+        <div class="no-departures" tal:condition="python:len(transport.departures) == 0">Det finnes ingen avganger i nær framtid.</div>
       </section>
     </div>
   </body>

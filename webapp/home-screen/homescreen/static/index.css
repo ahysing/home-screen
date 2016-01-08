@@ -106,3 +106,9 @@ iframe {
 *[id^='col-md-'] {
   display: inline;
 }
+.no-departures {
+  margin 15px;
+  background-color: #EE8888;
+  color: #FFFFFF;
+  font-size: 0.5em;
+}

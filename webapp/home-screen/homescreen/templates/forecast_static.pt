@@ -17,40 +17,43 @@
       <h1>${weather_h1}</h1>
     </header>
     <section tal:repeat="weather_response forecast" class="forecast">
-      <article class="weather-container" tabindex="-1" tal:repeat="it weather_response.time_forecasts">
+      <article tabindex="-1" tal:repeat="it weather_response.time_forecasts">
         <span class="temperature">${it.temperature}°</span>
         <span tal:switch="it.symbol_number_ex">
-          <i tal:case="4" tal:attributes="class string:wi wi-cloud"></i>
-          <i tal:case="14" tal:attributes="class string:wi wi-day-alt-snow-thunderstorm"></i>
-          <i tal:case="3" tal:attributes="class string:wi wi-day-cloudy"></i>
-          <i tal:case="7" tal:attributes="class string:wi wi-day-rain"></i>
-          <i tal:case="9" tal:attributes="class string:wi wi-day-rain"></i>
-          <i tal:case="10" tal:attributes="class string:wi wi-day-rain"></i>
-          <i tal:case="25" tal:attributes="class string:wi wi-day-showers"></i>
-          <i tal:case="30" tal:attributes="class string:wi wi-day-sleet-storm"></i>
-          <i tal:case="12" tal:attributes="class string:wi wi-day-sleet"></i>
-          <i tal:case="13" tal:attributes="class string:wi wi-day-sleet"></i>
-          <i tal:case="14" tal:attributes="class string:wi wi-day-snow-thunderstorm"></i>
-          <i tal:case="8" tal:attributes="class string:wi wi-day-snow"></i>
-          <i tal:case="47" tal:attributes="class string:wi wi-day-sprinkle"></i>
-          <i tal:case="2" tal:attributes="class string:wi wi-day-sunny-overcast"></i>
-          <i tal:case="1" tal:attributes="class string:wi wi-day-sunny"></i>
-          <i tal:case="14" tal:attributes="class string:wi wi-day-thunderstorm"></i>
-          <i tal:case="15" tal:attributes="class string:wi wi-fog"></i>
-          <i tal:case="5" tal:attributes="class string:wi wi-hail"></i>
-          <i tal:case="11" tal:attributes="class string:wi wi-lightning"></i>
-          <i tal:case="48" tal:attributes="class string:wi wi-rain-mix"></i>
-          <i tal:case="46" tal:attributes="class string:wi wi-raindrop"></i>
-          <i tal:case="42" tal:attributes="class string:wi wi-sleet"></i>
-          <i tal:case="49" tal:attributes="class string:wi wi-snow"></i>
-          <i tal:case="50" tal:attributes="class string:wi wi-snowflake-cold"></i>
-          <i tal:case="25" tal:attributes="class string:wi wi-storm-showers"></i>
-          <i tal:case="default" tal:attributes="class string:wi wi-na default" tal:content="it.symbol_number_ex"></i>
+          <i tal:case="4" class="weather-icon wi wi-cloud" title="${it.symbol_name}" ></i>
+          <i tal:case="14" class="weather-icon wi wi-day-alt-snow-thunderstorm" title="${it.symbol_name}" ></i>
+          <i tal:case="3" class="weather-icon wi wi-day-cloudy" title="${it.symbol_name}" ></i>
+          <i tal:case="7" class="weather-icon wi wi-day-rain" title="${it.symbol_name}" ></i>
+          <i tal:case="9" class="weather-icon wi wi-day-rain" title="${it.symbol_name}" ></i>
+          <i tal:case="10" class="weather-icon wi wi-day-rain" title="${it.symbol_name}" ></i>
+          <i tal:case="25" class="weather-icon wi wi-day-showers" title="${it.symbol_name}" ></i>
+          <i tal:case="30" class="weather-icon wi wi-day-sleet-storm" title="${it.symbol_name}" ></i>
+          <i tal:case="12" class="weather-icon wi wi-day-sleet" title="${it.symbol_name}" ></i>
+          <i tal:case="13" class="weather-icon wi wi-day-sleet" title="${it.symbol_name}" ></i>
+          <i tal:case="14" class="weather-icon wi wi-day-snow-thunderstorm" title="${it.symbol_name}" ></i>
+          <i tal:case="8" class="weather-icon wi wi-day-snow" title="${it.symbol_name}" ></i>
+          <i tal:case="47" class="weather-icon wi wi-day-sprinkle" title="${it.symbol_name}" ></i>
+          <i tal:case="2" class="weather-icon wi wi-day-sunny-overcast" title="${it.symbol_name}" ></i>
+          <i tal:case="1" class="weather-icon wi wi-day-sunny" title="${it.symbol_name}" ></i>
+          <i tal:case="14" class="weather-icon wi wi-day-thunderstorm" title="${it.symbol_name}" ></i>
+          <i tal:case="15" class="weather-icon wi wi-fog" title="${it.symbol_name}" ></i>
+          <i tal:case="5" class="weather-icon wi wi-hail" title="${it.symbol_name}" ></i>
+          <i tal:case="11" class="weather-icon wi wi-lightning" title="${it.symbol_name}" ></i>
+          <i tal:case="48" class="weather-icon wi wi-rain-mix" title="${it.symbol_name}" ></i>
+          <i tal:case="46" class="weather-icon wi wi-raindrop" title="${it.symbol_name}" ></i>
+          <i tal:case="42" class="weather-icon wi wi-sleet" title="${it.symbol_name}" ></i>
+          <i tal:case="49" class="weather-icon wi wi-snow" title="${it.symbol_name}" ></i>
+          <i tal:case="50" class="weather-icon wi wi-snowflake-cold" title="${it.symbol_name}" ></i>
+          <i tal:case="25" class="weather-icon wi wi-storm-showers" title="${it.symbol_name}" ></i>
+          <i tal:case="default" class="weather-icon wi wi-na default" tal:content="it.symbol_number_ex" title="${it.symbol_name}" ></i>
         </span>
-        <span class="time"> <time datetime="${it.start}" tal:define="start_pp python:it.start[11:16] | ''" tal:content="start_pp"></time>
-        <span> ${dt_separator} </span>
-        <span class="time"> <time datetime="${it.to}" tal:define="to_pp python:it.to[11:16] | ''" tal:content="to_pp"></time>
-        </span>
+        <div class="weather-time">
+          <span class="time"> <time datetime="${it.start}" tal:define="start_pp python:it.start[11:16] | ''" tal:content="start_pp"></time>
+          <span> ${dt_separator} </span>
+          <span class="time"> <time datetime="${it.to}" tal:define="to_pp python:it.to[11:16] | ''" tal:content="to_pp"></time>
+          </span>
+        </div>
+        <div class="horizontal-line"></div>
       </article>
       <footer class="forecast-credits">
         <small><a href="${weather_response.credit.url}">${weather_response.credit.text}</a></small>

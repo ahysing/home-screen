@@ -2,19 +2,29 @@
     addEventListener, coords, element, geolocation, getCurrentPosition,
     getElementsByClassName, textContent, latitude, length, location, log,
     longitude, onreadystatechange, open, readyState, replace, responseText,
-    send, status
+    send, status,
+    element, credits, num_forecasts, beg_id
 */
 var FORECAST_POLL_DELAY = 86400000;
 var FORECAST_RETRY_DELAY = 6000;
-var dt_separator = 'til'
+var dt_separator = 'til';
 var forecast_object = {
-    'element': undefined,
+    'beg_id': -1,
     'credits': undefined,
+    'element': undefined,
     'num_forecasts': 5
 };
 
-function fallback() {
-    window.location = window.location + '/static';
+function fallbackLocationIgnorantBrowser() {
+    'use strict';
+    var CLS = '.forecast';
+    var noscript = document.querySelector(CLS + ' > noscript');
+    if (noscript) {
+        var statics = document.createElement('div');
+        statics.innerHTML = noscript.innerText;
+        var f = document.querySelector(CLS);
+        f.replaceChild(statics, noscript);
+    }
 }
 
 function begForLocation(callback, err_callback) {
@@ -22,21 +32,21 @@ function begForLocation(callback, err_callback) {
     if ('geolocation' in navigator) {
         navigator.geolocation.getCurrentPosition(callback, err_callback);
     } else {
-        fallback();
+        fallbackLocationIgnorantBrowser();
     }
 }
 
 function updateForecastDisplay(root, credit_root, responseText) {
     var result = JSON.parse(responseText);
-    var forecast_result = result['forecast'];
+    var forecast_result = result.forecast;
     if (root !== undefined && Array.isArray(forecast_result)) {
         var slice_size = forecast_object.num_forecasts;
         var container = document.createElement('div');
         forecast_result.forEach(function(area) {
             var forecast_text = document.createElement('h1');
-            forecast_text.textContent = area['place']['name'];
+            forecast_text.textContent = area.place.name;
             container.appendChild(forecast_text);
-            var forecasts = area['time_forecasts'];
+            var forecasts = area.time_forecasts;
             forecasts.slice(0, slice_size).forEach(function(x, i) {
                 var forecast = document.createElement('article');
                 var time_elem = document.createElement('div');
@@ -45,18 +55,18 @@ function updateForecastDisplay(root, credit_root, responseText) {
                 var time_to = document.createElement('time');
                 var element = document.createElement('i');
                 var temperature_elem = document.createElement('div');
-                var temperature = x['temperature'];
-                var tool_tip = x['symbol_name'];
+                var temperature = x.temperature;
+                var tool_tip = x.symbol_name;
 
-                var start_s = x['start'];
+                var start_s = x.start;
                 time_from.setAttribute('datetime', start_s);
                 time_from.textContent = start_s.substr(11,5);
                 time_separator.textContent = " "+ dt_separator +" ";
-                var time_e = x['to'];
+                var time_e = x.to;
                 time_to.setAttribute('datetime', time_e);
                 time_to.textContent = time_e.substr(11,5);
 
-                var symbol = parseInt(x['symbol_number_ex']);
+                var symbol = parseInt(x.symbol_number_ex);
                 var s = '';
                 // http://om.yr.no/forklaring/symbol/
                 switch (symbol) {
@@ -150,7 +160,7 @@ function updateForecastDisplay(root, credit_root, responseText) {
                         break;
                     case 40:
                         s = 'wi-day-showers';
-                        break
+                        break;
                     case 41:
                         s = 'wi-day-rain';
                         break;
@@ -190,6 +200,8 @@ function updateForecastDisplay(root, credit_root, responseText) {
                     case 37:
                     case 38:
                     case 39:
+                        s = 'wi-na';
+                        break;
                     default:
                         s = 'wi-na';
                         break;
@@ -219,10 +231,10 @@ function updateForecastDisplay(root, credit_root, responseText) {
 
             if (credit_root !== undefined && area !== null && area.hasOwnProperty('credit')) {
                 var a = document.createElement('a');
-                var cred = area['credit'];
+                var cred = area.credit;
                 if (cred !== null && cred.hasOwnProperty('url') && cred.hasOwnProperty('text')) {
-                    var link = cred['url'];
-                    var text = cred['text'];
+                    var link = cred.url;
+                    var text = cred.text;
                     a.setAttribute('href', link);
                     a.textContent = text;
                     credit_root.textContent = '';
@@ -238,17 +250,17 @@ function updateForecastDisplay(root, credit_root, responseText) {
 
     root.replaceChild(container, root.firstChild);
 }
-
-function deniedLocation() {
+function deniedLocation(position_error) {
+    'use strict';
     console.error('location denied for forecasts!');
-    setTimeout(startPollingForecast, FORECAST_RETRY_DELAY);
+    stopPollingForecast();
+    setTimeout(userRequestForecast, FORECAST_RETRY_DELAY);
 }
 
 function requestForecastForLocation(position) {
     'use strict';
     var xhr = new XMLHttpRequest();
     function handleForecast() {
-        'use strict';
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
                 updateForecastDisplay(forecast_object.element, forecast_object.credits, xhr.responseText);
@@ -265,9 +277,17 @@ function requestForecastForLocation(position) {
     xhr.onreadystatechange = handleForecast;
     xhr.send();
 }
-function startPollingForecast() {
+function userRequestForecast() {
     'use strict';
     begForLocation(requestForecastForLocation, deniedLocation);
+}
+function startPollingForecast() {
+    'use strict';
+    forecast_object.beg_id = setInterval(userRequestForecast, FORECAST_POLL_DELAY);
+}
+function stopPollingForecast() {
+    'use strict';
+    clearInterval(forecast_object.beg_id);
 }
 function setupForecast() {
     'use strict';
@@ -279,8 +299,8 @@ function setupForecast() {
     var forecast = document.getElementsByClassName('forecast');
     if (forecast.length > 0) {
         forecast_object.element = forecast[0];
+        userRequestForecast();
         startPollingForecast();
-        setInterval(startPollingForecast, FORECAST_POLL_DELAY);
     }
 }
 
@@ -288,8 +308,6 @@ function main() {
     'use strict';
     if (window.addEventListener) {
         window.addEventListener('load', setupForecast, false);
-    } else {
-        fallback();
     }
 }
 
