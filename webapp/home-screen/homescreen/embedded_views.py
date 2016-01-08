@@ -10,7 +10,6 @@ import logging
 from time_utils import TimeUtils
 
 logger = logging.getLogger(__name__)
-TIME_ZONE = 'Europe/Oslo'
 
 
 def _filter_forecast_fields(forecasts, request_keys):
@@ -78,8 +77,7 @@ def forecast_keys(request):
 def datetime_now(request):
     fname = sys._getframe().f_code.co_name
     logger.info('%s', fname)
-    dt = datetime.datetime.now()
-    dt = TimeUtils().shift_to_timezone(dt, TIME_ZONE)
+    dt = TimeUtils().timenow_system_with_timezone()
     time_s = dt.isoformat()
     request.response.headers['Cache-Control'] = 'no-cache'
     request.response.expires = http_date(dt)

@@ -8,13 +8,15 @@ from .webutils import get_content_type
 from .public_transport import Departure, Stop, DepartureResponse
 from .departure_handler import DepartureHandler
 from .stop_handler import StopHandler
+from .web_service_exception import WebServiceException
 import cStringIO
 import math
+from time_utils import TimeUtils
 
 logger = logging.getLogger(__name__)
 
 
-class RuterException(Exception):
+class RuterException(WebServiceException):
     pass
 
 
@@ -116,7 +118,7 @@ def _parse_stopid_for_location(raw, content_type):
             d = _parse_json_stops(raw)
         else:
             logger.error('Content-Type {}'.format(content_type))
-            raise RuterException("unknown parse format for stopID")
+            raise RuterException(error="unknown parse format for stopID")
     return d
 
 
@@ -127,13 +129,14 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
     :param longitude:
     :return:
     """
+    service_reis_timeout = 14 # 7.603 seconds is the highest tieout we have seen from that service so far
     # TODO: coordinates paramter
     url_template = 'http://reisapi.ruter.no/Place/GetClosestStops?coordinates=(x={easting},y={northing})&maxdistance={distance}'
     source_url = url_template.format(distance=int(distance), easting=easting, northing=northing)
     logger.debug(source_url)
     request = urllib2.Request(source_url, headers={'Accepts': 'application/xml'})
     try:
-        response = urllib2.urlopen(request)
+        response = urllib2.urlopen(request, timeout=service_reis_timeout)
         content_type = get_content_type(response)
         response_body = response.read()
         status_code = response.getcode()
@@ -144,6 +147,7 @@ def fetch_stopid_for_location(easting, northing, distance=1400):
     except urllib2.URLError as e:
         logger.error(str(e))
         raise RuterException(e)
+
 
 def _get_closest_stop_by_distance(stop_ids, center_x, center_y):
     shortest_stop_distance = float('inf')
@@ -214,7 +218,7 @@ def _parse_transport_for_stop(raw, content_type):
             d = _parse_json_departures(raw)
         else:
             logger.error('Content-Type {}'.format(content_type))
-            raise RuterException("unknown parse format for stopID")
+            raise RuterException(error="unknown parse format for stopID")
     return d
 
 
@@ -243,9 +247,6 @@ def fetch_transport_for_stop(stop, datetime):
 
 def lookup_transport_for_stop(latitude, longitude, limit=-1):
     """
-    documenation for location lookup
-
-
     documentation for departures
     http://reisapi.ruter.no/Help/Api/GET-StopVisit-GetDepartures-id_datetime_transporttypes_linenames
     :param latitude:
@@ -256,9 +257,10 @@ def lookup_transport_for_stop(latitude, longitude, limit=-1):
     departure_response = DepartureResponse()
     stop = scan_closest_stopid_for_location(latitude, longitude)
     if stop:
-        next_hour_d = datetime.datetime.now() + datetime.timedelta(hours=1)
-        next_hour = next_hour_d.isoformat()
-        response_body, status_code, content_type = fetch_transport_for_stop(stop, next_hour)
+        half_hour_m = 0
+        next_half_hour_date = TimeUtils().timenow_system() + datetime.timedelta(minutes=half_hour_m)
+        next_half_hour = next_half_hour_date.isoformat()
+        response_body, status_code, content_type = fetch_transport_for_stop(stop, next_half_hour)
         if status_code == 200:
             departures = _parse_transport_for_stop(response_body, content_type)
             departure_response.stop = stop

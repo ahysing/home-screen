@@ -122,7 +122,7 @@ function updateTransportDisplay(elem, text) {
                         if (diff_m) delay_tt += diff_m_rem + ' ' + MINUTES_TEXT + ' ';
                         if (diff_s) delay_tt += diff_s_rem + ' ' + SECONDS_TEXT + ' ';
                         delay_txt.textContent = delay_tt;
-                        delay_txt.setAttribute('class', 'delay');
+                        delay_txt.setAttribute('class', 'delay-text');
                         delay_txt.dataset.delayMs = diff_ms;
                     }
 

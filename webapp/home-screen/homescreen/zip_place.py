@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 
 class ZipPlace(object):
     def __init__(self, zip = '', latitude = 0.0, longitude = 0.0, place = ''):

@@ -121,6 +121,7 @@ def fetch_postnummer_closest_to(latitude, longitude, radius=0.1, num_results=25,
 
 
 def lookup_postnummer_closest_to(latitude, longitude, radius=0.1, num_results=25, page=0):
+    no_postnummer = []
     latitude = float(latitude)
     longitude = float(longitude)
 
@@ -130,4 +131,4 @@ def lookup_postnummer_closest_to(latitude, longitude, radius=0.1, num_results=25
         return _parse_postnummer_closest_to(response_body, latitude, longitude)
     else:
         logger.error("Returned " + str(status_code))
-        return None
+        return no_postnummer

@@ -102,11 +102,12 @@ iframe {
 }
 .delay {
   color: #EE8888;
+  margin 15px;
 }
 *[id^='col-md-'] {
   display: inline;
 }
-.no-departures {
+.no-departures, .delay-text {
   margin 15px;
   background-color: #EE8888;
   color: #FFFFFF;
