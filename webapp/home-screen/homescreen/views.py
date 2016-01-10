@@ -45,7 +45,7 @@ def transport_next_static(request):
     stop_name = 'Fornebu Vest'
     transport = None
     updated = datetime.datetime.utcnow()
-    updated = TimeUtils().shift_to_timezone(updated, TIME_ZONE)
+    updated = TimeUtils()._shift_to_timezone(updated, TIME_ZONE)
     updated_txt = updated.strftime('%H:%M')
     updated_label = 'Sist oppdatert kl '
 

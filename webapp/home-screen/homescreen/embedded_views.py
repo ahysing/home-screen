@@ -77,7 +77,7 @@ def forecast_keys(request):
 def datetime_now(request):
     fname = sys._getframe().f_code.co_name
     logger.info('%s', fname)
-    dt = TimeUtils().timenow_system_with_timezone()
+    dt = TimeUtils().systemtime_with_timezone()
     time_s = dt.isoformat()
     request.response.headers['Cache-Control'] = 'no-cache'
     request.response.expires = http_date(dt)

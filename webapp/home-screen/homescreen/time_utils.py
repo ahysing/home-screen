@@ -4,19 +4,19 @@ import datetime
 
 
 class TimeUtils(object):
-    def shift_to_timezone(self, date, timezone):
+    def _shift_to_timezone(self, date, timezone):
         from_zone = pytz.utc
         to_zone = pytz.timezone(timezone)
         date = date.replace(tzinfo=from_zone)
         updated = date.astimezone(to_zone)
         return updated
 
-    def timenow_system_with_timezone(self):
-        TIME_ZONE = 'Europe/Oslo'
+    def systemtime_with_timezone(self):
+        time_zone = 'Europe/Oslo'
         dt = datetime.datetime.now()
-        return self.shift_to_timezone(dt, TIME_ZONE)
+        return self._shift_to_timezone(dt, time_zone)
 
-    def timenow_system(self):
-        dt = self.timenow_system_with_timezone()
+    def systemtime(self):
+        dt = self.systemtime_with_timezone()
         dt = dt.replace(tzinfo=None)
         return dt

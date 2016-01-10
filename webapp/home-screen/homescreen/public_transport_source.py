@@ -258,7 +258,7 @@ def lookup_transport_for_stop(latitude, longitude, limit=-1):
     stop = scan_closest_stopid_for_location(latitude, longitude)
     if stop:
         half_hour_m = 0
-        next_half_hour_date = TimeUtils().timenow_system() + datetime.timedelta(minutes=half_hour_m)
+        next_half_hour_date = TimeUtils().systemtime() + datetime.timedelta(minutes=half_hour_m)
         next_half_hour = next_half_hour_date.isoformat()
         response_body, status_code, content_type = fetch_transport_for_stop(stop, next_half_hour)
         if status_code == 200:
