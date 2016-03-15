@@ -12,10 +12,8 @@ class PublicTansportSourceTests(unittest.TestCase):
         self.json = 'application/xjson'
         self.xml = 'application/xml'
 
-
     def tearDown(self):
         pass
-
 
     def test_parse_stopid_for_location_xml(self):
         departures = _parse_stopid_for_location(XML_RESPONSE, self.xml)
@@ -26,36 +24,31 @@ class PublicTansportSourceTests(unittest.TestCase):
 #        departures = _parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
 #        self.assertIsNotNone(departures)
 
-
     def test_parse_transport_for_stop(self):
         departures = _parse_transport_for_stop(RESPONSE, self.json)
         self.assertIsNotNone(departures)
-
 
     def test_parse_transport_for_stop_returnsResponse(self):
         departures = _parse_transport_for_stop(RESPONSE, self.json)
         self.assertIsInstance(departures, list)
 
-
     def test_parse_stopid_for_location(self):
         response = _parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
         self.assertIsInstance(response, list)
-
 
     def test_parse_stopid_for_location_response_has_stop_name(self):
         response = _parse_stopid_for_location(STOPID_FOR_LOCATION_RESPONSE, self.json)
         self.assertIsNotNone(response)
         self.assertNotEqual(0, len(response))
 
-
     def test_get_closest_stop_by_distance(self):
         s1 = Stop()
-        s1.x =1
-        s1.y =2
+        s1.x = 1
+        s1.y = 2
 
         s2 = Stop()
-        s2.x =100
-        s2.y =299
+        s2.x = 100
+        s2.y = 299
 
         stops = [s1, s2]
         x = 1
@@ -65,8 +58,14 @@ class PublicTansportSourceTests(unittest.TestCase):
         self.assertEqual(result, s1)
 
 
-
-STOPID_FOR_LOCATION_RESPONSE = """[{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"Marker","ShortName":"","IsHub":false,"ID":1197385,"Name":"Yterbøl","District":"Marker","PlaceType":"Stop"},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170623,"Name":"Espa E6 Syd","District":"Stange","PlaceType":"Stop"},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170624,"Name":"Espa E6 Nord","District":"Stange","PlaceType":"Stop"}]"""
+STOPID_FOR_LOCATION_RESPONSE = """
+[{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":0\
+,"Y":0,"Zone":"Marker","ShortName":"","IsHub":false,"ID":1197385,"Name":"Yterbøl","District":"Marker","PlaceType":"Stop"\
+},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":\
+0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170623,"Name":"Espa E6 Syd","District":"Stange","PlaceType":"Stop"\
+},{"AlightingAllowed":false,"BoardingAllowed":false,"RealTimeStop":false,"Lines":[],"StopPoints":[],"Deviations":[],"X":\
+0,"Y":0,"Zone":"0","ShortName":"","IsHub":false,"ID":4170624,"Name":"Espa E6 Nord","District":"Stange","PlaceType":"Stop\
+"}]"""
 
 PROXIMITY_RESPONSE = """\
 [

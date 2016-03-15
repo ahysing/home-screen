@@ -5,10 +5,10 @@ from homescreen.embedded_views import _filter_forecast_date, _filter_forecast_fi
 import datetime
 from homescreen.weather import Time
 
+
 class EmbeddedViewsTests(unittest.TestCase):
     def setUp(self):
         pass
-
 
     def tearDown(self):
         pass

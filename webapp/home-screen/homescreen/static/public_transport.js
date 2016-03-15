@@ -11,14 +11,12 @@ var MINUTES_TEXT = 'minutter';
 var SECONDS_TEXT = 'sekunder';
 var ALT_ICN = 'Transportmiddel for avreise';
 var TRANSPORT_LIMIT =  '10';
-var TRANSPORT_POLL_DELAY = 3600000;
 var TRANSPORT_RETRY_DELAY = 6000;
 
 var pt_object = {
-    'beg_id': -1,
     'element': undefined
 };
-function fallbackLocationIgnorantBrowser() {
+function fallbackLocationIgnorantBrowserTransport() {
     'use strict';
     var CLS = '.transport';
     var noscript = document.querySelector(CLS + ' > noscript');
@@ -29,19 +27,9 @@ function fallbackLocationIgnorantBrowser() {
         f.replaceChild(statics, noscript);
     }
 }
-function begForLocation(callback, error_callback) {
-    'use strict';
-    if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(callback, error_callback);
-    } else {
-        fallbackLocationIgnorantBrowser();
-    }
-}
 function deniedLocation(position_error) {
     'use strict';
     console.error('location denied for public transports!');
-    stopPollingTransport();
-    setTimeout(userRequestTransport, TRANSPORT_RETRY_DELAY);
 }
 function iso8601_to_time_hm(time_pp) {
     'use strict';
@@ -174,15 +162,7 @@ function requestTransportForLocation(e) {
 }
 function userRequestTransport() {
     'use strict';
-    begForLocation(requestTransportForLocation, deniedLocation);
-}
-function startPollingTransport() {
-    'use strict';
-    pt_object.beg_id = setInterval(userRequestTransport, TRANSPORT_POLL_DELAY);
-}
-function stopPollingTransport() {
-    'use strict';
-    clearInterval(pt_object.beg_id);
+    return [requestTransportForLocation, deniedLocation];
 }
 function setupTransport() {
     'use strict';
@@ -190,8 +170,6 @@ function setupTransport() {
     if (transport.length > 0) {
         var t = transport[0];
         pt_object.element = t;
-        userRequestTransport();
-        startPollingTransport();
     }
 }
 

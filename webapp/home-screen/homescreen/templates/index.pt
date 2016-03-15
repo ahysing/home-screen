@@ -46,6 +46,60 @@
     <script src="${request.static_url('homescreen:static/forecast.min.js')}" defer='defer'></script>
     <script src="${request.static_url('homescreen:static/public_transport.min.js')}" defer='defer'></script>
     <script src="${request.static_url('homescreen:static/mail_exchange.min.js')}" defer='defer'></script>
+    <script>
+      var state_object = {
+        'beg_id': -1
+      };
+      var POLL_DELAY = 3600000;
+
+      function begForLocation(callback, error_callback) {
+          'use strict';
+          if ('geolocation' in navigator) {
+              var options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 1
+              };
+              navigator.geolocation.getCurrentPosition(callback, error_callback, options);
+          } else {
+              fallbackLocationIgnorantBrowserForecast();
+              fallbackLocationIgnorantBrowserTransport();
+          }
+      }
+      function startPolling (func) {
+        'use strict';
+        state_object.beg_id = setInterval(func, POLL_DELAY);
+      }
+      function stopPolling() {
+          'use strict';
+          clearInterval(state_object.beg_id);
+      }
+      function startLocationCall() {
+        function success(e) {
+          var t = userRequestTransport();
+          var f = userRequestForecast();
+          var t_success = t[0];
+          var f_success = f[0];
+          t_success(e);
+          f_success(e);
+        }
+        function fail(e) {
+          var t = userRequestTransport();
+          var f = userRequestForecast();
+          var t_fail = t[1];
+          var f_fail = f[1];
+          t_fail(e);
+          f_fail(e);
+        }
+        begForLocation(success, fail);
+        startPolling(function() {
+          begForLocation(success, fail);
+        });
+      }
+      if (window.addEventListener) {
+          window.addEventListener('load', startLocationCall, false);
+      }
+    </script>
     <!-- Bootstrap core JavaScript ================================================== -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
   </body>

@@ -2,6 +2,7 @@
 from .weather import Time, Credit, Place, WeatherResponse
 import xml.sax
 
+
 class WeatherHandler(xml.sax.handler.ContentHandler):
     """
     kilde: http://om.yr.no/verdata/xml/spesifikasjon/

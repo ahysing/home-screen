@@ -5,8 +5,6 @@
     send, status,
     element, credits, num_forecasts, beg_id
 */
-var FORECAST_POLL_DELAY = 86400000;
-var FORECAST_RETRY_DELAY = 6000;
 var dt_separator = 'til';
 var forecast_object = {
     'beg_id': -1,
@@ -15,7 +13,7 @@ var forecast_object = {
     'num_forecasts': 5
 };
 
-function fallbackLocationIgnorantBrowser() {
+function fallbackLocationIgnorantBrowserForecast() {
     'use strict';
     var CLS = '.forecast';
     var noscript = document.querySelector(CLS + ' > noscript');
@@ -24,15 +22,6 @@ function fallbackLocationIgnorantBrowser() {
         statics.innerHTML = noscript.innerText;
         var f = document.querySelector(CLS);
         f.replaceChild(statics, noscript);
-    }
-}
-
-function begForLocation(callback, err_callback) {
-    'use strict';
-    if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(callback, err_callback);
-    } else {
-        fallbackLocationIgnorantBrowser();
     }
 }
 
@@ -253,8 +242,6 @@ function updateForecastDisplay(root, credit_root, responseText) {
 function deniedLocation(position_error) {
     'use strict';
     console.error('location denied for forecasts!');
-    stopPollingForecast();
-    setTimeout(userRequestForecast, FORECAST_RETRY_DELAY);
 }
 
 function requestForecastForLocation(position) {
@@ -279,15 +266,7 @@ function requestForecastForLocation(position) {
 }
 function userRequestForecast() {
     'use strict';
-    begForLocation(requestForecastForLocation, deniedLocation);
-}
-function startPollingForecast() {
-    'use strict';
-    forecast_object.beg_id = setInterval(userRequestForecast, FORECAST_POLL_DELAY);
-}
-function stopPollingForecast() {
-    'use strict';
-    clearInterval(forecast_object.beg_id);
+    return [requestForecastForLocation, deniedLocation];
 }
 function setupForecast() {
     'use strict';
@@ -299,8 +278,6 @@ function setupForecast() {
     var forecast = document.getElementsByClassName('forecast');
     if (forecast.length > 0) {
         forecast_object.element = forecast[0];
-        userRequestForecast();
-        startPollingForecast();
     }
 }
 

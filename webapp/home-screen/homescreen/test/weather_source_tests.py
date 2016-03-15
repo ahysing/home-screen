@@ -3,6 +3,7 @@ import unittest
 from ..weather import Credit, Time, WeatherResponse
 from ..weather_source import _parse_forecast
 
+
 class WeatherSourceTests(unittest.TestCase):
     def setUp(self):
         pass
@@ -42,10 +43,12 @@ RESPONSE = """\
     <location altitude="9" latitude="59.8949" longitude="10.6258" geobase="postnummer" geobaseid="1364"/>
   </location>
   <credit>
-    <!--For å bruke gratis værdata fra yr.no, MÅ du vise følgende tekst godt synlig på nettsiden din. Teksten skal være en lenke til URL-en som er spesifisert.-->
+    <!--For å bruke gratis værdata fra yr.no, MÅ du vise følgende tekst godt synlig på nettsiden din. Teksten skal være \
+en lenke til URL-en som er spesifisert.-->
     <!--Les mer om vilkår for bruk av gratis værdata + retningslinjer på
 http://om.yr.no/verdata/ -->
-    <link text="Værvarsel fra yr.no, levert av NRK og Meteorologisk institutt" url="http://www.yr.no/sted/Norge/Postnummer/1364_Fornebu/"/>
+    <link text="Værvarsel fra yr.no, levert av NRK og Meteorologisk institutt"
+url="http://www.yr.no/sted/Norge/Postnummer/1364_Fornebu/"/>
   </credit>
   <links>
     <link id="xmlSource" url="http://www.yr.no/sted/Norge/Postnummer/1364_Fornebu/varsel.xml"/>
@@ -65,19 +68,25 @@ http://om.yr.no/verdata/ -->
       <location name="1364 Fornebu">
         <time from="2015-11-14" to="2015-11-14">
           <title>lørdag</title>
-          <body>&lt;strong&gt;Østlandet og Telemark:&lt;/strong&gt; Sørvestlig bris, på kysten av Østfold og Vestfold opp i stiv kuling. Stort sett oppholdsvær og perioder med sol.</body>
+          <body>&lt;strong&gt;Østlandet og Telemark:&lt;/strong&gt; Sørvestlig bris, på kysten av Østfold og Vestfold \
+opp i stiv kuling. Stort sett oppholdsvær og perioder med sol.</body>
         </time>
         <time from="2015-11-15" to="2015-11-15">
           <title>søndag</title>
-          <body>&lt;strong&gt;Østlandet og Telemark:&lt;/strong&gt; Vestlig bris. Lange perioder med sol, men først på dagen lokal tåke, enkelte regnbyger i nordlige områder av Østlandet.</body>
+          <body>&lt;strong&gt;Østlandet og Telemark:&lt;/strong&gt; Vestlig bris. Lange perioder med sol, men først på \
+dagen lokal tåke, enkelte regnbyger i nordlige områder av Østlandet.</body>
         </time>
         <time from="2015-11-16" to="2015-11-16">
           <title>mandag</title>
-          <body>&lt;strong&gt;Østlandet:&lt;/strong&gt; Sørøstlig bris. Oppholdsvær. Fra formiddagen periodevis sørøstlig kuling på kysten. Regn fra sør, nedbør som snø i indre høyere strøk først på dagen, senere snø nord på Østlandet. Omtrent uendret temperatur.</body>
+          <body>&lt;strong&gt;Østlandet:&lt;/strong&gt; Sørøstlig bris. Oppholdsvær. Fra formiddagen periodevis \
+sørøstlig kuling på kysten. Regn fra sør, nedbør som snø i indre høyere strøk først på dagen, senere snø nord på \
+Østlandet. Omtrent uendret temperatur.</body>
         </time>
         <time from="2015-11-17" to="2015-11-18">
           <title>tirsdag og onsdag</title>
-          <body>&lt;strong&gt;Sør-Norge:&lt;/strong&gt; Et lavtrykk beveger seg mot Sør-Norge. Det ventes sørvestlig vind, periodevis kuling på kysten og i fjellet. Perioder med regn, snø i fjellet, lavere snøgrense nord på Østlandet. Onsdag ventes nedbøraktiviteten å fortsette. Små temperaturendringer.</body>
+          <body>&lt;strong&gt;Sør-Norge:&lt;/strong&gt; Et lavtrykk beveger seg mot Sør-Norge. Det ventes sørvestlig \
+vind, periodevis kuling på kysten og i fjellet. Perioder med regn, snø i fjellet, lavere snøgrense nord på Østlandet. \
+Onsdag ventes nedbøraktiviteten å fortsette. Små temperaturendringer.</body>
         </time>
       </location>
     </text>
@@ -455,16 +464,19 @@ http://om.yr.no/verdata/ -->
     </tabular>
   </forecast>
   <observations>
-    <weatherstation stno="18815" sttype="eklima" name="Bygdøy" distance="3372" lat="59.90500" lon="10.68280" source="Meteorologisk Institutt">
+    <weatherstation stno="18815" sttype="eklima" name="Bygdøy" distance="3372" lat="59.90500" lon="10.68280" \
+source="Meteorologisk Institutt">
       <temperature unit="celsius" value="3.1" time="2015-11-14T10:00:00Z"/>
     </weatherstation>
-    <weatherstation stno="18700" sttype="eklima" name="Oslo (Blindern)" distance="7441" lat="59.94230" lon="10.72000" source="Meteorologisk Institutt">
+    <weatherstation stno="18700" sttype="eklima" name="Oslo (Blindern)" distance="7441" lat="59.94230" lon="10.72000" \
+source="Meteorologisk Institutt">
       <symbol number="4" name="Skyet" time="2015-11-14T09:00:00Z"/>
       <temperature unit="celsius" value="3.3" time="2015-11-14T11:00:00Z"/>
       <windDirection deg="206.0" code="SSW" name="Sør-sørvest" time="2015-11-14T11:00:00Z"/>
       <windSpeed mps="2.2" name="Svak vind" time="2015-11-14T11:00:00Z"/>
     </weatherstation>
-    <weatherstation stno="18950" sttype="eklima" name="Tryvannshøgda" distance="10278" lat="59.98470" lon="10.66930" source="Meteorologisk Institutt">
+    <weatherstation stno="18950" sttype="eklima" name="Tryvannshøgda" distance="10278" lat="59.98470" lon="10.66930" \
+source="Meteorologisk Institutt">
       <temperature unit="celsius" value="-0.1" time="2015-11-14T11:00:00Z"/>
       <windDirection deg="207.0" code="SSW" name="Sør-sørvest" time="2015-11-14T11:00:00Z"/>
       <windSpeed mps="4.3" name="Lett bris" time="2015-11-14T11:00:00Z"/>

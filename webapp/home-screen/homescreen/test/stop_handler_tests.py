@@ -21,10 +21,8 @@ class DepartureHandlerTests(unittest.TestCase):
     def setUp(self):
         pass
 
-
     def tearDown(self):
         pass
-
 
     def test_parse_emptytag(self):
         pass
